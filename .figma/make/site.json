@@ -1,0 +1,10 @@
+{
+  "description": "An intuitive e-commerce platform tailored for refrigeration and electrical products offering seamless browsing, filtering, and checkout with local currency pricing.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

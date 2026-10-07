@@ -28,28 +28,28 @@ export default function Header() {
   }
 
   const linkCls = ({ isActive }: { isActive: boolean }) =>
-    `relative py-2 text-[15px] font-medium transition-colors ${isActive ? 'text-brand after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-brand' : 'text-ink hover:text-brand'}`
+    `relative py-2 text-[clamp(0.9375rem,1.11vw,1rem)] font-semibold transition-colors ${isActive ? 'text-brand after:absolute after:inset-x-0 after:-bottom-[0.6rem] after:h-[3px] after:rounded-full after:bg-brand' : 'text-navy-900 hover:text-brand'}`
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-brand bg-white">
-      <div className="container-x flex h-20 items-center justify-between gap-6">
-        <Logo />
-        <nav aria-label="Principal" className="hidden lg:block">
-          <ul className="flex items-center gap-10 xl:gap-12">
+      <div className="container-x flex h-[clamp(4rem,6.67vw,6rem)] items-center gap-6">
+        <span className="lg:pl-[1.5rem]"><Logo /></span>
+        <nav aria-label="Principal" className="hidden lg:ml-[clamp(2rem,4.8vw,4.35rem)] lg:block">
+          <ul className="flex items-center gap-[clamp(1.75rem,2.85vw,2.5rem)]">
             {NAV.map((n) => (
               <li key={n.to}><NavLink to={n.to} end={n.to === '/'} className={linkCls}>{n.label}</NavLink></li>
             ))}
           </ul>
         </nav>
-        <div className="flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-[clamp(0.25rem,1.4vw,1.25rem)]">
           {site.flags.showSearch && (
-            <button onClick={() => setSearchOpen((v) => !v)} className="grid size-11 place-items-center rounded-full text-ink hover:bg-surface" aria-label="Buscar productos" aria-expanded={searchOpen}>
-              <Search className="size-6" strokeWidth={2.2} />
+            <button onClick={() => setSearchOpen((v) => !v)} className="grid size-11 place-items-center rounded-full text-navy-900 hover:bg-surface" aria-label="Buscar productos" aria-expanded={searchOpen}>
+              <Search className="size-6 lg:size-[2.15rem]" strokeWidth={2.1} />
             </button>
           )}
-          <Link to="/carrito" className="relative grid size-11 place-items-center rounded-full text-ink hover:bg-surface" aria-label={`Carrito, ${count} productos`}>
-            <ShoppingCart className="size-6" strokeWidth={2.2} />
-            <span className="absolute right-1 top-1 grid min-w-[18px] place-items-center rounded-full bg-orange px-1 text-[10px] font-bold leading-[18px] text-white">{count}</span>
+          <Link to="/carrito" className="relative grid size-11 place-items-center rounded-full text-navy-900 hover:bg-surface" aria-label={`Carrito, ${count} productos`}>
+            <ShoppingCart className="size-6 lg:size-[2.15rem]" strokeWidth={2.1} />
+            <span className="absolute -right-0.5 -top-0.5 grid min-w-[19px] place-items-center rounded-full bg-orange px-1 text-[11px] font-bold leading-[19px] text-white">{count}</span>
           </Link>
           <button onClick={() => setOpen((v) => !v)} className="grid size-11 place-items-center rounded-full hover:bg-surface lg:hidden" aria-label="Abrir menú" aria-expanded={open}>
             {open ? <X className="size-5" /> : <Menu className="size-5" />}

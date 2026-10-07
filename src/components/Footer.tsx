@@ -10,7 +10,7 @@ export default function Footer() {
     <footer className="bg-navy-950 text-white/80">
       <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo inverted />
+          <Logo variant="circular" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed">{site.slogan}. Productos y servicio técnico en refrigeración y electricidad.</p>
           <div className="mt-5 flex gap-3">
             <a href={site.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-orange"><FacebookIcon /></a>

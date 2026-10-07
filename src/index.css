@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@600;800&display=swap');
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Poppins', 'Inter', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, sans-serif;
+  --font-logo: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
   --color-navy-950: #071a3d;
   --color-navy-900: #0b2557;
   --color-navy-800: #12336f;
@@ -17,6 +18,8 @@
   --color-surface: #f4f7fc;
 }
 
+:root { --gutter: clamp(1rem, 2.25vw, 2rem); }
+
 @layer base {
   body { @apply bg-white text-ink font-sans antialiased; }
   h1, h2, h3, h4 { @apply font-display; }
@@ -24,7 +27,25 @@
 }
 
 @layer components {
-  .container-x { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  /* Base de diseño: 1440 px de ancho → contenido de 77rem (1232 px) a 104 px de cada borde. */
+  .container-x { @apply mx-auto w-full; max-width: calc(77rem + 2 * var(--gutter)); padding-inline: var(--gutter); }
+
+  /* Logo horizontal: emblema (copo + engranaje) recortado de logo.jpg (1536×1536).
+     Recuadro del emblema en el original: x 470–1036, y 152–718 (566 px). */
+  .logo-h { display: flex; flex-shrink: 0; align-items: center; gap: clamp(0.5rem, 1.1vw, 1rem); }
+  .logo-h__emblem {
+    width: var(--emblem); height: var(--emblem); flex-shrink: 0;
+    background-repeat: no-repeat;
+    background-size: calc(1536 / 566 * 100%);
+    background-position: calc(470 / (1536 - 566) * 100%) calc(152 / (1536 - 566) * 100%);
+    /* oculta los trazos del círculo exterior que asoman en las esquinas superiores */
+    clip-path: polygon(0 10%, 23% 0, 78% 0, 100% 9%, 100% 100%, 0 100%);
+    mix-blend-mode: multiply;
+  }
+  .logo-h__text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-h__name { font-family: var(--font-logo); font-weight: 800; font-size: var(--logo-name); letter-spacing: -0.01em; line-height: 0.8; }
+  .logo-h__tag { margin-top: calc(var(--logo-name) * 0.24); font-family: var(--font-logo); font-weight: 600; font-size: calc(var(--logo-name) * 0.25); letter-spacing: 0.12em; text-transform: uppercase; color: #14223f; white-space: nowrap; }
+  .logo-h { --emblem: clamp(3rem, 5.85vw, 5.25rem); --logo-name: clamp(1.45rem, 2.7vw, 2.45rem); }
   .eyebrow { @apply font-display text-xs font-semibold uppercase tracking-[0.2em] text-brand; }
   .input { @apply w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20; }
   .label { @apply mb-1.5 block text-sm font-medium text-ink; }

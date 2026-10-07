@@ -5,7 +5,7 @@ import { site } from '@/config/site'
 import { getCategories, getProducts } from '@/services'
 import { useAsync } from '@/lib/useAsync'
 import { placeholder } from '@/lib/placeholder'
-import heroBg from '@/assets/fondo_clima.png'
+import heroBg from '@/assets/fondo_clima.webp'
 import Icon from '@/components/Icon'
 import ProductCard from '@/components/ProductCard'
 

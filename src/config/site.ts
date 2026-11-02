@@ -62,6 +62,18 @@ export const site = {
       { title: 'Calidad garantizada', text: 'Trabajamos con marcas y materiales certificados.' },
     ],
   },
+  // Logo opcional: archivo en public/images/clientes/ (p. ej. '/images/clientes/easy.png'). Sin logo se muestra el nombre.
+  clients: {
+    title: 'Clientes que confían en nosotros',
+    items: [
+      { name: 'Easy' },
+      { name: 'Cruz Verde' },
+      { name: 'Galería Casa Colorada' },
+      { name: 'Estacionamientos Catedral' },
+      { name: 'CK Equipamiento Aeronáutico' },
+      { name: 'Unión Árabe de Beneficencia' },
+    ] as { name: string; logo?: string }[],
+  },
   paymentMethods: ['Mercado Pago', 'Tarjetas de crédito y débito', 'Transferencia bancaria'],
   shipping: { enabled: false },
   delivery: {

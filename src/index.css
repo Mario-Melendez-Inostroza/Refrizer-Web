@@ -30,6 +30,16 @@
   /* Base de diseño: 1440 px de ancho → contenido de 77rem (1232 px) a 104 px de cada borde. */
   .container-x { @apply mx-auto w-full; max-width: calc(77rem + 2 * var(--gutter)); padding-inline: var(--gutter); }
 
+  /* Carrusel de clientes: la lista va duplicada y se desplaza la mitad de su ancho en bucle. */
+  .marquee { overflow: hidden; mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); }
+  .marquee__track { display: flex; width: max-content; gap: 1rem; padding-block: 0.25rem; animation: marquee 28s linear infinite; }
+  .marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
+  @keyframes marquee { to { transform: translateX(calc(-50% - 0.5rem)); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { overflow-x: auto; mask-image: none; }
+    .marquee__track { animation: none; }
+  }
+
   /* Logo horizontal: emblema (copo + engranaje) recortado de logo.jpg (1536×1536).
      Recuadro del emblema en el original: x 470–1036, y 152–718 (566 px). */
   .logo-h { display: flex; flex-shrink: 0; align-items: center; gap: clamp(0.5rem, 1.1vw, 1rem); }

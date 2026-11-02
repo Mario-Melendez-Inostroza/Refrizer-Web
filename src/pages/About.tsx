@@ -2,6 +2,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { site } from '@/config/site'
 import { placeholder } from '@/lib/placeholder'
 import PageHeader from '@/components/PageHeader'
+import ClientsMarquee from '@/components/ClientsMarquee'
 
 export default function About() {
   const a = site.about
@@ -24,6 +25,7 @@ export default function About() {
           </div>
         </div>
       </section>
+      <ClientsMarquee />
     </>
   )
 }

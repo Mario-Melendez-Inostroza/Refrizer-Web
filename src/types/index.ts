@@ -46,6 +46,8 @@ export type ProductSort = 'default' | 'price-asc' | 'price-desc'
 
 export interface ProductQuery {
   category?: string
+  /** Solo para el carrito: pide estos productos por id. */
+  ids?: number[]
   search?: string
   featured?: boolean
   sort?: ProductSort

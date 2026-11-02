@@ -10,6 +10,7 @@ export async function getProducts(query: ProductQuery = {}): Promise<Product[]> 
   if (useMocks) return getMockProducts(query)
   const list = await wcFetch<StoreProduct[]>('/products', {
     per_page: 100,
+    include: query.ids?.join(','),
     category: query.category,
     search: query.search?.trim(),
     featured: query.featured ? true : undefined,

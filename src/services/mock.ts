@@ -10,6 +10,7 @@ const normalize = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLo
 
 export async function getMockProducts(query: ProductQuery = {}): Promise<Product[]> {
   let list = [...mockProducts]
+  if (query.ids) list = list.filter((p) => query.ids!.includes(p.id))
   if (query.featured) list = list.filter((p) => p.featured)
   if (query.category) list = list.filter((p) => p.categories.some((c) => c.slug === query.category))
   if (query.search) {

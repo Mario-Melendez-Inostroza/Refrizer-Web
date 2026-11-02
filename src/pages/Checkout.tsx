@@ -23,7 +23,7 @@ function validate(f: Form) {
 }
 
 export default function Checkout() {
-  const { items, subtotal } = useCart()
+  const { items, subtotal, loading } = useCart()
   const [form, setForm] = useState<Form>(empty)
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({})
   const navigate = useNavigate()
@@ -41,6 +41,8 @@ export default function Checkout() {
     // TODO: crear preferencia de Mercado Pago y redirigir a init_point.
     navigate('/pedido/retorno?status=pending')
   }
+
+  if (loading) return <div className="container-x py-24 text-center text-muted" role="status">Cargando tu carrito…</div>
 
   if (items.length === 0)
     return (

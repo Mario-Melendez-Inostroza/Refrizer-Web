@@ -1,0 +1,41 @@
+# Tienda React (SPA) en la raíz del dominio. WordPress vive en /wp con su propio .htaccess.
+# Vite copia este archivo a dist/ y de ahí va a public_html/. NO PROBADO en BenzaHosting: requiere Apache (o
+# compatible) leyendo .htaccess detrás de nginx, con mod_rewrite y mod_headers (ver docs y wordpress/README.md).
+# Sin directivas Options/DirectoryIndex a propósito: si el hosting no permite sobrescribirlas, darían error 500.
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # WordPress (/wp, /wp/wp-json para la Store API y la conciliación, /wp/wc-api para el aviso de Mercado Pago)
+  # nunca pasa por la SPA.
+  RewriteRule ^wp(/|$) - [L]
+
+  # Archivos con hash de Vite: se marcan para la caché larga (ver mod_headers abajo).
+  RewriteRule ^assets/ - [E=TIENDA_ASSET:1]
+
+  # Archivos y carpetas que existen se sirven tal cual.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # El resto (/pedido/retorno, /producto/x, /checkout...) lo resuelve React.
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # index.html sin caché: tras cada despliegue el navegador debe pedir los nombres nuevos de /assets.
+  <FilesMatch "^index\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  # /assets/*: el nombre cambia con el contenido, se pueden guardar un año.
+  Header set Cache-Control "public, max-age=31536000, immutable" env=TIENDA_ASSET
+
+  # Cabeceras de seguridad para todo el dominio (también /wp, porque PHP pasa por aquí). Sin CSP a propósito: una CSP
+  # forzada rompería wp-admin y, sin probarla en un navegador, podría cortar el retorno de Mercado Pago (roadmap S4).
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # HSTS: los navegadores lo ignoran por HTTP. Sin includeSubDomains ni preload (son difíciles de deshacer).
+  Header always set Strict-Transport-Security "max-age=31536000"
+</IfModule>

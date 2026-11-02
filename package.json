@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:hosting": "vite build --mode hosting",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "format": "oxfmt"
   },

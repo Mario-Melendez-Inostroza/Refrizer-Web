@@ -31,8 +31,8 @@
 ## 3. Frontend (playbook §3)
 
 - [ ] **F1** (C) `src/config/site.ts` y `.figma/make/site.json` con la marca, el contacto, el despacho y el prefijo; `npm test`; `npm run build:hosting`; sin secretos en `dist/`
-- [ ] **F2** (M) Antes de subir: conservar el bloque PHP de cPanel del `.htaccess` del servidor; subir solo el contenido de `dist/`; no tocar `wp/`
-- [ ] **F3** (C) Verificar: `/pedido/retorno` y `/producto/x` sin 404, cabeceras de caché y de seguridad, Store API y conciliación en 200
+- [x] **F2** (C, 2026-11-02: `dist/` de `build:hosting` subido a `public_html` con zip extraído; `.htaccess` combinado (bloque PHP de cPanel conservado + reglas de la tienda) con copia en `tienda-cron/backup-20261102-htaccess-public_html.txt`; `wp/` intacto) Antes de subir: conservar el bloque PHP de cPanel del `.htaccess` del servidor; subir solo el contenido de `dist/`; no tocar `wp/`
+- [~] **F3** (C, 2026-11-02: `/pedido/retorno`, `/producto/x` y `/checkout` dan 200 con la SPA; `/wp/`, Store API, assets y robots.txt 200; cabeceras `Cache-Control: no-cache` en index.html y de seguridad presentes; la raíz muestra la tienda con URL única. Falta: ver el catálogo con productos reales y caché larga de /assets) Verificar: `/pedido/retorno` y `/producto/x` sin 404, cabeceras de caché y de seguridad, Store API y conciliación en 200
 
 ## 4. Pruebas con credenciales de PRUEBA (playbook §4)
 

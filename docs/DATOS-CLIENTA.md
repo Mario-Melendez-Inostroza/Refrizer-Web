@@ -10,11 +10,11 @@ Solo datos que **no** son secretos. **Nunca** escribas aquí contraseñas, Acces
 - Redes sociales: 
 
 ## Dominio y hosting
-- Dominio: 
-- Proveedor de hosting y plan: 
-- Usuario de cPanel (solo el nombre): 
-- Carpeta del sitio en el servidor (la que muestra WooCommerce > Estado): 
-- Versión de PHP asignada: 
+- Dominio: refrizer.cl (dominio principal; www y mail como alias)
+- Proveedor de hosting y plan: BenzaHosting, servidor srv60 (cuota 8 GB)
+- Usuario de cPanel (solo el nombre): refrizer
+- Carpeta del sitio en el servidor (la que muestra WooCommerce > Estado): /home/refrizer/public_html (raíz del dominio; confirmar en WooCommerce > Estado)
+- Versión de PHP asignada: ea-php81 el 2026-11-02 (hay que subir a 8.3; disponibles 8.3, 8.4 y 8.5)
 - ¿El DNS lo administra el mismo hosting? (sí/no): 
 - Buzón de correo para el remitente de la tienda: 
 

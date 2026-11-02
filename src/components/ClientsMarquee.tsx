@@ -7,7 +7,7 @@ export default function ClientsMarquee() {
   const tile = (c: (typeof items)[number], i: number, hidden: boolean) => (
     <li key={`${c.name}-${i}`} aria-hidden={hidden || undefined} className="flex h-20 w-52 shrink-0 items-center justify-center rounded-xl border border-line bg-white px-5 text-center">
       {c.logo ? (
-        <img src={c.logo} alt={hidden ? '' : c.name} loading="lazy" className="max-h-12 w-auto object-contain opacity-70 grayscale transition hover:opacity-100 hover:grayscale-0" />
+        <img src={c.logo} alt={hidden ? '' : c.name} loading="lazy" className="max-h-12 w-auto max-w-full object-contain" />
       ) : (
         <span className="text-sm font-semibold leading-tight text-navy-900">{c.name}</span>
       )}

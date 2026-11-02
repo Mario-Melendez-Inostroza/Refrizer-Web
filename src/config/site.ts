@@ -66,12 +66,12 @@ export const site = {
   clients: {
     title: 'Clientes que confían en nosotros',
     items: [
-      { name: 'Easy' },
-      { name: 'Cruz Verde' },
-      { name: 'Galería Casa Colorada' },
-      { name: 'Estacionamientos Catedral' },
-      { name: 'CK Equipamiento Aeronáutico' },
-      { name: 'Unión Árabe de Beneficencia' },
+      { name: 'Easy', logo: '/images/clientes/easy.webp' },
+      { name: 'Cruz Verde', logo: '/images/clientes/cruz-verde.webp' },
+      { name: 'Galería Casa Colorada', logo: '/images/clientes/galeria-casa-colorada.webp' },
+      { name: 'Estacionamientos Catedral', logo: '/images/clientes/estacionamientos-catedral.webp' },
+      { name: 'CK Equipamiento Aeronáutico', logo: '/images/clientes/ck-equipamiento-aeronautico.webp' },
+      { name: 'Unión Árabe de Beneficencia', logo: '/images/clientes/union-arabe-de-beneficencia.webp' },
     ] as { name: string; logo?: string }[],
   },
   paymentMethods: ['Mercado Pago', 'Tarjetas de crédito y débito', 'Transferencia bancaria'],

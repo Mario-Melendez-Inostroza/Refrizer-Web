@@ -1,6 +1,5 @@
 import { CheckCircle2 } from 'lucide-react'
 import { site } from '@/config/site'
-import { placeholder } from '@/lib/placeholder'
 import PageHeader from '@/components/PageHeader'
 import ClientsMarquee from '@/components/ClientsMarquee'
 
@@ -11,7 +10,7 @@ export default function About() {
       <PageHeader eyebrow={a.eyebrow} title={<>{a.title} <span className="text-[#6ea0ff]">{a.highlightBlue}</span> y <span className="text-orange">{a.highlightOrange}</span></>} />
       <section className="py-14">
         <div className="container-x grid items-center gap-10 lg:grid-cols-2">
-          <img src={placeholder('Imagen equipo', 900, 700)} alt="Equipo de Refrizer" className="aspect-[9/7] w-full rounded-2xl object-cover" />
+          <img src="/images/nosotros.webp" alt="Letrero de Refrizer, refrigeración y electricidad" width={1774} height={887} className="aspect-video w-full rounded-2xl object-cover object-[35%_center]" />
           <div>
             <p className="text-lg leading-relaxed text-muted">{a.text}</p>
             <ul className="mt-8 space-y-5">

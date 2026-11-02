@@ -49,3 +49,10 @@ El servidor (WordPress, plugin, cron, pruebas P1–P11 y paso a producción) sig
 ## 5. Pendientes que dependen de Mario o la clienta
 
 Dominio, hosting, carpeta del sitio en el servidor, cuenta vendedora de Mercado Pago, productos reales, textos legales y un buzón de correo del dominio. Ver `docs/DATOS-CLIENTA.md`.
+
+## 6. Avance
+
+- **Fase 0** (hecha, 2026-11-02): base, scripts, proxy, este documento.
+- **Fase 1** (código hecho, 2026-11-02): `src/services/client.ts` (Store API, mismo origen), `woocommerce.ts` (mapeo + sanitizado del HTML de descripciones) y `products.ts` leyendo de WooCommerce. Verificado con `npm test` (14 pruebas), `tsc` y `build:hosting`. **No probado en vivo** contra WordPress: falta un WooCommerce con productos.
+  - Desarrollo con datos de ejemplo: `VITE_USE_MOCKS=true` en `.env.local`.
+  - Desarrollo contra un WordPress real: `WC_URL=https://<dominio>` en `.env.local` (el proxy de Vite traduce `/wp/wp-json` a `WC_URL/wp-json`).

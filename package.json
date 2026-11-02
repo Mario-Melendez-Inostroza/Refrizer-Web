@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:hosting": "vite build --mode hosting",
     "typecheck": "tsc --noEmit",
+    "test": "node --test \"src/**/*.test.ts\"",
     "preview": "vite preview",
     "format": "oxfmt"
   },

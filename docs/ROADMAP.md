@@ -18,12 +18,12 @@
 
 ## 2. Servidor (playbook §2)
 
-- [ ] **S1** (M) WordPress + WooCommerce en `/wp`; direcciones del sitio = `https://<dominio>/wp`; enlaces permanentes distintos de "Simple"; sitio **Visible** (nunca "Próximamente")
-- [ ] **S2** (M) CLP sin decimales, precios con IVA, envío desactivado, "Mantener stock" 60 min, **zona horaria `America/Santiago`**
-- [ ] **S3** (M) PHP 8.3 o superior (verificar en WooCommerce > Estado)
-- [ ] **S4** (M) Plugin de Mercado Pago: Checkout Pro **Redirect**, opciones avanzadas guardadas, **las tres URLs de retorno** = `https://<dominio>/pedido/retorno`, debug apagado al entregar
-- [ ] **S5** (M) `config.php` en `tienda-secretos/` (600), cargado desde `wp-config.php`; `TC_MP_ACCESS_TOKEN`, `TC_MP_SELLER_ID` (último grupo del token), `TC_DRY_RUN=true`, `TC_MIN_AGE_SECONDS=300`, `TC_REFERENCE_PREFIX`
-- [ ] **S6** (M) Plugin `tienda-conciliacion` subido y activo; `POST /wp/wp-json/tienda/v1/reconcile {}` → `not_found`
+- [x] **S1** (C+M, 2026-11-02: WordPress 7.1.4 en /wp, direcciones https://refrizer.cl/wp, enlaces permanentes «Día y nombre», sitio «Visible» (se quitó «Próximamente»); AutoSSL/Let's Encrypt válido hasta 2027-01-31) WordPress + WooCommerce en `/wp`; direcciones del sitio = `https://<dominio>/wp`; enlaces permanentes distintos de "Simple"; sitio **Visible** (nunca "Próximamente")
+- [x] **S2** (C, 2026-11-02: CLP sin decimales, envío desactivado, mantener stock 60 min, zona horaria America/Santiago; impuestos de WooCommerce desactivados, así que los precios se ingresan con IVA) CLP sin decimales, precios con IVA, envío desactivado, "Mantener stock" 60 min, **zona horaria `America/Santiago`**
+- [x] **S3** (C, 2026-11-02: WooCommerce > Estado muestra PHP 8.3.36) PHP 8.3 o superior (verificar en WooCommerce > Estado)
+- [~] **S4** (C instaló y activó el plugin de Mercado Pago 8.9.7, sin vincular; falta que M lo vincule con el token de prueba, Checkout Pro Redirect, las tres URLs de retorno y guardar) Plugin de Mercado Pago: Checkout Pro **Redirect**, opciones avanzadas guardadas, **las tres URLs de retorno** = `https://<dominio>/pedido/retorno`, debug apagado al entregar
+- [~] **S5** (C, 2026-11-02: `tienda-secretos/config.php` creado SIN token, permisos 0600, `require_once` añadido en wp-config.php con copia en `tienda-cron/backup-20261102-wp-config.php`; falta que M pegue el token de PRUEBA y el `TC_MP_SELLER_ID`) `config.php` en `tienda-secretos/` (600), cargado desde `wp-config.php`; `TC_MP_ACCESS_TOKEN`, `TC_MP_SELLER_ID` (último grupo del token), `TC_DRY_RUN=true`, `TC_MIN_AGE_SECONDS=300`, `TC_REFERENCE_PREFIX`
+- [x] **S6** (C, 2026-11-02: plugin subido y activo; `POST /wp/wp-json/tienda/v1/reconcile {}` → `not_found`) Plugin `tienda-conciliacion` subido y activo; `POST /wp/wp-json/tienda/v1/reconcile {}` → `not_found`
 - [ ] **S7** (C+M) Cron de cPanel cada 5 min; el registro muestra `vendedor=match` (ruta del sitio según WooCommerce > Estado)
 - [ ] **S8** (M) Seguridad: ModSecurity activo, `session.upload_progress` apagado, "Sin índice" en cPanel > Índices, administrador con nombre distinto del de cPanel, 2FA (WP 2FA, con códigos de respaldo), plugins sin usar borrados, respaldos revisados, escáner de Imunify360 limpio
 - [ ] **S9** (M) Entregabilidad del correo: SPF, DKIM y DMARC en "Valid" para el dominio

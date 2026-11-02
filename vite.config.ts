@@ -8,9 +8,11 @@ import path from 'node:path'
  * Usa SITE_URL si existe, o el dominio de producción que Vercel entrega al compilar (demo).
  * Sin ninguna de las dos (p. ej. en local) queda vacío y la ruta es relativa.
  */
-function siteUrl(): Plugin {
+function siteUrl(mode: string): Plugin {
   const host = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  const url = (process.env.SITE_URL || (host ? `https://${host}` : '')).replace(/\/$/, '')
+  // El build para el hosting real (--mode hosting) apunta al dominio de la tienda aunque no se defina SITE_URL.
+  const fallback = mode === 'hosting' ? 'https://refrizer.cl' : host ? `https://${host}` : ''
+  const url = (process.env.SITE_URL || fallback).replace(/\/$/, '')
   return {
     name: 'site-url',
     transformIndexHtml: (html) => html.replace(/%SITE_URL%/g, url),
@@ -36,7 +38,7 @@ export default defineConfig(({ mode }) => {
   return {
     // `npm run build:hosting` (modo "hosting") publica en la raíz del dominio de BenzaHosting.
     base: '/',
-    plugins: [react(), tailwindcss(), siteUrl()],
+    plugins: [react(), tailwindcss(), siteUrl(mode)],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

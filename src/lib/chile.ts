@@ -1,21 +1,4 @@
-export const REGIONES: Record<string, string[]> = {
-  'Arica y Parinacota': ['Arica', 'Camarones', 'Putre', 'General Lagos'],
-  'Tarapacá': ['Iquique', 'Alto Hospicio', 'Pozo Almonte', 'Pica', 'Huara'],
-  'Antofagasta': ['Antofagasta', 'Mejillones', 'Taltal', 'Calama', 'Tocopilla', 'San Pedro de Atacama'],
-  'Atacama': ['Copiapó', 'Caldera', 'Vallenar', 'Chañaral', 'Huasco'],
-  'Coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel', 'Vicuña', 'Andacollo'],
-  'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué', 'Villa Alemana', 'Concón', 'San Antonio', 'Quillota', 'Los Andes', 'San Felipe'],
-  'Metropolitana de Santiago': ['Santiago', 'Providencia', 'Las Condes', 'Ñuñoa', 'La Florida', 'Maipú', 'Puente Alto', 'Vitacura', 'Lo Barnechea', 'La Reina', 'Macul', 'Peñalolén', 'San Miguel', 'Estación Central', 'Recoleta', 'Independencia', 'Quilicura', 'Huechuraba', 'Pudahuel', 'Cerrillos', 'La Cisterna', 'San Bernardo', 'Colina', 'Lampa', 'Talagante', 'Melipilla'],
-  "Libertador General Bernardo O'Higgins": ['Rancagua', 'Machalí', 'San Fernando', 'Rengo', 'Pichilemu', 'Santa Cruz'],
-  'Maule': ['Talca', 'Curicó', 'Linares', 'Constitución', 'Cauquenes', 'Molina'],
-  'Ñuble': ['Chillán', 'Chillán Viejo', 'San Carlos', 'Bulnes', 'Quirihue'],
-  'Biobío': ['Concepción', 'Talcahuano', 'San Pedro de la Paz', 'Chiguayante', 'Los Ángeles', 'Coronel', 'Hualpén', 'Tomé'],
-  'La Araucanía': ['Temuco', 'Padre Las Casas', 'Villarrica', 'Pucón', 'Angol', 'Victoria'],
-  'Los Ríos': ['Valdivia', 'La Unión', 'Panguipulli', 'Río Bueno'],
-  'Los Lagos': ['Puerto Montt', 'Osorno', 'Puerto Varas', 'Castro', 'Ancud', 'Frutillar'],
-  'Aysén del General Carlos Ibáñez del Campo': ['Coyhaique', 'Puerto Aysén', 'Chile Chico'],
-  'Magallanes y de la Antártica Chilena': ['Punta Arenas', 'Puerto Natales', 'Porvenir', 'Puerto Williams'],
-}
+export { REGIONS as REGIONES } from './regions'
 
 /** Valida un RUT chileno (formato 12.345.678-9 o 12345678-9) */
 export function isValidRut(rut: string): boolean {

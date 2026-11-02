@@ -57,3 +57,18 @@ export interface CartItem {
   product: Product
   quantity: number
 }
+
+export interface CheckoutPayload {
+  customer: { firstName: string; lastName: string; email: string; phone: string; rut: string }
+  shipping: { region: string; commune: string; address: string }
+  notes: string
+  /** Total que el comprador vio (CLP). WooCommerce rechaza el checkout si su total no coincide (expected_total). */
+  expectedTotal: number
+  /** Solo id + cantidad: WooCommerce calcula los precios */
+  items: { productId: number; quantity: number }[]
+}
+
+export interface CheckoutResponse { redirectUrl: string }
+
+export type OrderStatus = 'pending' | 'paid' | 'failed'
+export interface OrderStatusResponse { id: string; status: OrderStatus }

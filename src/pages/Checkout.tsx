@@ -1,9 +1,10 @@
 import { useState, type FormEvent, type InputHTMLAttributes } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { Lock, Truck } from 'lucide-react'
 import { useCart } from '@/lib/cart'
 import { formatCLP } from '@/lib/format'
 import { REGIONES, formatRut, isValidRut } from '@/lib/chile'
+import { createCheckout } from '@/services'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
 
@@ -12,7 +13,7 @@ const empty: Form = { nombre: '', rut: '', email: '', telefono: '', region: '', 
 
 function validate(f: Form) {
   const e: Partial<Record<keyof Form, string>> = {}
-  if (!f.nombre.trim()) e.nombre = 'Ingresa tu nombre completo'
+  if (f.nombre.trim().split(/\s+/).length < 2) e.nombre = 'Ingresa tu nombre y apellido'
   if (!isValidRut(f.rut)) e.rut = 'RUT inválido'
   if (!/^\S+@\S+\.\S+$/.test(f.email)) e.email = 'Correo inválido'
   if (f.telefono.replace(/\D/g, '').length < 8) e.telefono = 'Teléfono inválido'
@@ -26,11 +27,12 @@ export default function Checkout() {
   const { items, subtotal, loading } = useCart()
   const [form, setForm] = useState<Form>(empty)
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({})
-  const navigate = useNavigate()
+  const [submitting, setSubmitting] = useState(false)
+  const [payError, setPayError] = useState('')
 
   const set = (k: keyof Form, v: string) => setForm((f) => ({ ...f, [k]: v, ...(k === 'region' ? { comuna: '' } : {}) }))
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault()
     const errs = validate(form)
     setErrors(errs)
@@ -38,8 +40,23 @@ export default function Checkout() {
       document.getElementById(Object.keys(errs)[0])?.focus()
       return
     }
-    // TODO: crear preferencia de Mercado Pago y redirigir a init_point.
-    navigate('/pedido/retorno?status=pending')
+    setPayError('')
+    setSubmitting(true)
+    try {
+      // WooCommerce pide nombre y apellido por separado: la primera palabra es el nombre y el resto el apellido.
+      const [firstName, ...rest] = form.nombre.trim().split(/\s+/)
+      const { redirectUrl } = await createCheckout({
+        customer: { firstName, lastName: rest.join(' '), email: form.email.trim(), phone: form.telefono.trim(), rut: form.rut },
+        shipping: { region: form.region, commune: form.comuna, address: form.direccion.trim() },
+        notes: form.notas,
+        expectedTotal: subtotal,
+        items: items.map((i) => ({ productId: i.product.id, quantity: i.quantity })),
+      })
+      window.location.assign(redirectUrl)
+    } catch (err) {
+      setPayError(err instanceof Error && err.message ? err.message : 'No pudimos iniciar el pago. Inténtalo nuevamente.')
+      setSubmitting(false)
+    }
   }
 
   if (loading) return <div className="container-x py-24 text-center text-muted" role="status">Cargando tu carrito…</div>
@@ -111,7 +128,8 @@ export default function Checkout() {
               ))}
             </ul>
             <div className="mt-3 flex justify-between border-t border-line pt-4"><span className="font-semibold">Total</span><span className="font-display text-xl font-bold text-navy-900">{formatCLP(subtotal)}</span></div>
-            <button type="submit" className="btn mt-6 w-full bg-[#009ee3] py-3.5 text-white hover:bg-[#0089c5]">Pagar con Mercado Pago</button>
+            {payError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{payError}</p>}
+            <button type="submit" disabled={submitting} className="btn mt-6 w-full bg-[#009ee3] py-3.5 text-white hover:bg-[#0089c5] disabled:opacity-60">{submitting ? 'Redirigiendo a Mercado Pago…' : 'Pagar con Mercado Pago'}</button>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted"><Lock className="size-3.5" aria-hidden="true" />Pago seguro procesado por Mercado Pago</p>
           </aside>
         </form>

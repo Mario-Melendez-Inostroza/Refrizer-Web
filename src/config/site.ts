@@ -82,6 +82,8 @@ export const site = {
     showSearch: true,
   },
   currency: 'CLP',
+  // Identificación del proveedor para los Términos (razón social, RUT y domicilio): se muestra solo si están name y rut.
+  legal: { name: '', rut: '', address: '' },
 }
 
 export type SiteConfig = typeof site

@@ -131,6 +131,7 @@ export default function Checkout() {
             {payError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{payError}</p>}
             <button type="submit" disabled={submitting} className="btn mt-6 w-full bg-[#009ee3] py-3.5 text-white hover:bg-[#0089c5] disabled:opacity-60">{submitting ? 'Redirigiendo a Mercado Pago…' : 'Pagar con Mercado Pago'}</button>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted"><Lock className="size-3.5" aria-hidden="true" />Pago seguro procesado por Mercado Pago</p>
+            <p className="mt-3 text-center text-xs text-muted">Al pagar aceptas los <Link to="/terminos" className="underline hover:text-brand">Términos y condiciones</Link> y la política de <Link to="/cambios-y-devoluciones" className="underline hover:text-brand">Cambios y devoluciones</Link>.</p>
           </aside>
         </form>
       </section>

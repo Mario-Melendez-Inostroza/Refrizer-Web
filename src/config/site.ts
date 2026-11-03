@@ -47,7 +47,7 @@ export const site = {
   benefits: [
     { icon: 'delivery', title: 'Entrega coordinada', text: 'Coordinamos la entrega contigo' },
     { icon: 'shield', title: 'Productos originales', text: 'y con garantía' },
-    { icon: 'card', title: 'Múltiples medios de pago', text: 'Mercado Pago • Transferencia' },
+    { icon: 'card', title: 'Pago seguro', text: 'con Mercado Pago' },
     { icon: 'headset', title: 'Asesoría personalizada', text: 'en todo momento' },
   ],
   about: {
@@ -74,7 +74,7 @@ export const site = {
       { name: 'Unión Árabe de Beneficencia', logo: '/images/clientes/union-arabe-de-beneficencia.webp' },
     ] as { name: string; logo?: string }[],
   },
-  paymentMethods: ['Mercado Pago', 'Tarjetas de crédito y débito', 'Transferencia bancaria'],
+  paymentMethods: ['Mercado Pago'],
   shipping: { enabled: false },
   delivery: {
     text: 'Coordinamos la entrega contigo',

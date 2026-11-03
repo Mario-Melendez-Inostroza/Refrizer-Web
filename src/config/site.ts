@@ -11,7 +11,7 @@ export const site = {
     number: '56998525452',
     message: 'Hola Refrizer, quiero hacer una consulta.',
   },
-  email: 'contacto@refrizer.cl',
+  email: 'ventas@refrizer.cl',
   address: 'Santiago, Chile',
   city: 'Santiago, Chile',
   hours: 'Lun - Vie 09:00 a 18:00 | Sáb 09:00 a 13:00',

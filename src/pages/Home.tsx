@@ -59,6 +59,7 @@ function Hero() {
 
 function Categories() {
   const { data } = useAsync(getCategories, [])
+  if (data && data.length === 0) return null
   return (
     <section aria-label="Categorías" className="relative z-10 pb-8 pt-8">
       <div className="container-x">
@@ -124,7 +125,7 @@ export function ServicesBand() {
   return (
     <section className="grid bg-navy-900 text-white lg:grid-cols-[36%_1fr]">
       <div className="relative min-h-60 bg-navy-800">
-        <img src={placeholder('Imagen técnico', 800, 700)} alt="Técnico de Refrizer instalando un equipo" className="absolute inset-0 size-full object-cover opacity-90" />
+        <img src="/images/servicios.webp" alt="Equipos de climatización, refrigeración y electricidad" width={1200} height={800} loading="lazy" className="absolute inset-0 size-full object-cover opacity-90" />
       </div>
       <div className="container-x grid gap-10 py-14 lg:grid-cols-[1.1fr_1fr] lg:px-12">
         <div>
@@ -173,8 +174,12 @@ function About() {
           <Link to="/nosotros" className="btn-outline mt-6 py-2.5 text-[13px]">Conócenos<ArrowRight className="size-4" aria-hidden="true" /></Link>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          {['Instalación', 'Electricidad', 'Mantención'].map((l) => (
-            <img key={l} src={placeholder(l, 400, 380)} alt={`Imagen de ${l.toLowerCase()}`} className="aspect-[20/19] w-full rounded-xl border border-line object-cover" />
+          {[
+            ['Instalación', '/images/instalacion.webp'],
+            ['Electricidad', '/images/electricidad.webp'],
+            ['Mantención', '/images/mantencion.webp'],
+          ].map(([l, src]) => (
+            <img key={l} src={src} alt={`Imagen de ${l.toLowerCase()}`} width={640} height={640} loading="lazy" className="aspect-[20/19] w-full rounded-xl border border-line object-cover" />
           ))}
         </div>
       </div>

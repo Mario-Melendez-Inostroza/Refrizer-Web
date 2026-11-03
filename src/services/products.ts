@@ -34,7 +34,8 @@ export async function getProduct(slug: string): Promise<Product | null> {
 export async function getCategories(): Promise<Category[]> {
   if (useMocks) return getMockCategories()
   const list = await wcFetch<StoreCategory[]>('/products/categories', { per_page: 100, hide_empty: true })
-  return list.map(mapCategory)
+  // "Sin categorizar" es la categoría por defecto de WooCommerce: no se muestra como categoría de la tienda.
+  return list.filter((c) => c.slug !== 'sin-categorizar' && c.slug !== 'uncategorized').map(mapCategory)
 }
 
 export const searchProducts = (term: string) => getProducts({ search: term })

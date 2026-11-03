@@ -6,19 +6,15 @@ export const site = {
   slogan: 'Soluciones que enfrían y conectan',
 
   logo: logoUrl,
-  phone: '+56 9 1234 5678',
+  phone: '+56 9 9852 5452',
   whatsapp: {
-    number: '56912345678',
+    number: '56998525452',
     message: 'Hola Refrizer, quiero hacer una consulta.',
   },
   email: 'contacto@refrizer.cl',
   address: 'Santiago, Chile',
   city: 'Santiago, Chile',
   hours: 'Lun - Vie 09:00 a 18:00 | Sáb 09:00 a 13:00',
-  social: {
-    facebook: 'https://facebook.com/',
-    instagram: 'https://instagram.com/',
-  },
   hero: {
     eyebrow: 'Soluciones que enfrían y conectan',
     titleLines: ['Refrigeración y', 'Electricidad para'],

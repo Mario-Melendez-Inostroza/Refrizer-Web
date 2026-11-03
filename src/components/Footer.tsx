@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import { site } from '@/config/site'
-import { FacebookIcon, InstagramIcon, WhatsappIcon } from './SocialIcons'
+import { WhatsappIcon } from './SocialIcons'
 import { whatsappUrl } from '@/lib/format'
 import Logo from './Logo'
 
@@ -12,10 +12,6 @@ export default function Footer() {
         <div>
           <Logo variant="circular" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed">{site.slogan}. Productos y servicio técnico en refrigeración y electricidad.</p>
-          <div className="mt-5 flex gap-3">
-            <a href={site.social.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-orange"><FacebookIcon /></a>
-            <a href={site.social.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="grid size-9 place-items-center rounded-full bg-white/10 hover:bg-orange"><InstagramIcon /></a>
-          </div>
         </div>
         <div>
           <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-white">Navegación</h2>

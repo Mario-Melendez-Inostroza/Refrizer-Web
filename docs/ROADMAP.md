@@ -12,7 +12,7 @@
 - [ ] **K2** (Cliente) Cuenta **vendedora** de Mercado Pago verificada; comisión explicada y confirmada en su Simulador
 - [ ] **K3** (Cliente) Productos (10 a 25: fotos, descripción, precio con IVA, stock) y categorías
 - [ ] **K4** (Cliente) Textos legales (Términos, Cambios y devoluciones) y datos de contacto
-- [ ] **K5** (Cliente) Un **buzón de correo de su dominio** para el remitente de la tienda
+- [x] **K5** (M, 2026-11-03: creado `ventas@refrizer.cl` en cPanel, contraseña guardada por M; la clienta puede cambiarla desde cPanel o webmail sin afectar a la tienda, porque no hay plugin SMTP; si se agregara uno habría que actualizarla allí) Un **buzón de correo de su dominio** para el remitente de la tienda
 - [x] **K6** (M, 2026-11-03: **sin despacho por la página**; la clienta lo coordina por su cuenta. `shipping.enabled=false` y WooCommerce sin envío) Despacho: sin despacho (`shipping.enabled=false`) o con tarifas
 - [ ] **K7** (M) Integración de Mercado Pago creada (credenciales de **prueba** primero) y cuenta compradora de prueba
 
@@ -26,7 +26,7 @@
 - [x] **S6** (C, 2026-11-02: plugin subido y activo; `POST /wp/wp-json/tienda/v1/reconcile {}` → `not_found`) Plugin `tienda-conciliacion` subido y activo; `POST /wp/wp-json/tienda/v1/reconcile {}` → `not_found`
 - [x] **S7** (C, 2026-11-03: cron `*/5` creado con PHP 8.3 CLI; primera línea 01:35 UTC `barrido dry_run=si vendedor=match`, corre solo cada 5 min) Cron de cPanel cada 5 min; el registro muestra `vendedor=match` (ruta del sitio según WooCommerce > Estado)
 - [ ] **S8** (M) Seguridad: ModSecurity activo, `session.upload_progress` apagado, "Sin índice" en cPanel > Índices, administrador con nombre distinto del de cPanel, 2FA (WP 2FA, con códigos de respaldo), plugins sin usar borrados, respaldos revisados, escáner de Imunify360 limpio
-- [ ] **S9** (M) Entregabilidad del correo: SPF, DKIM y DMARC en "Valid" para el dominio
+- [x] **S9** (C, 2026-11-03: cPanel UAPI `validate_current_spfs` → VALID (`+a +mx +ip4:131.72.236.216 +ip4:131.72.236.219 ~all`); `validate_current_dkims` → VALID; `_dmarc.refrizer.cl` = `v=DMARC1; p=none;`) Entregabilidad del correo: SPF, DKIM y DMARC en "Valid" para el dominio
 
 ## 3. Frontend (playbook §3)
 
@@ -44,7 +44,7 @@
 - [x] **P6** (C, 2026-11-03: `wp/.htaccess` restaurado desde la copia, idéntico al original (551 bytes) y sin el bloque `TC-PRUEBA-P2`; el aviso da 400 por ruta y por `?wc-api=`; Store API 200 y `POST /tienda/v1/reconcile {}` → `not_found`) **Quitar el bloqueo del IPN** y verificar 400 (no 403) en `/wp/wc-api/WC_WooMercadoPago_Basic_Gateway/`
 - [ ] **P7** (C) Ruta REST: clave o correo erróneos y pedido inexistente dan `not_found`; repetir antes de 60 s → `try_later`
 - [~] **P8** (M+C, 2026-11-03: **rechazo probado**: pedido 21 con la Mastercard de prueba guardada en el comprador → Mercado Pago "No pudimos procesar tu pago"; el cron registra `no_approved_payment` (el pago se creó y se rechazó); el pedido sigue "Pendiente de pago", sin descontar stock. **Aprobación con tarjeta no lograda en sandbox** (igual que en el staging); se probará con tarjeta real en R2) **Pago con tarjeta de prueba aprobada** (titular `APRO`) y **pago rechazado** (`FUND` u `OTHE`): qué muestra `/pedido/retorno`, estado y stock del pedido, la conciliación no lo toca. Tarjetas y titulares: documentación de Mercado Pago (Checkout Pro > Realizar compras de prueba), en ventana de incógnito
-- [ ] **P9** (2026-11-03: **falla**: remitente actual es un Gmail y Gmail marca "no autenticado", van a spam. Falta buzón de refrizer.cl (K5) + SPF/DKIM/DMARC (S9) y cambiar el remitente en WooCommerce) (M+C) **Correos a la bandeja de entrada**: Gmail > Mostrar original con SPF, DKIM y DMARC en PASS
+- [x] **P9** (2026-11-03: antes con remitente Gmail caían en spam con el aviso "no autenticado". Remitente cambiado en WooCommerce a `Refrizer <ventas@refrizer.cl>`; el recibo del pedido #22 llegó a **Recibidos** de Gmail, sin el aviso de autenticación. **No probado:** la lectura de las cabeceras SPF/DKIM/DMARC en "Mostrar original"; basta con la bandeja y la ausencia del aviso, pero conviene revisarlo una vez con el correo real de la clienta) (M+C) **Correos a la bandeja de entrada**: Gmail > Mostrar original con SPF, DKIM y DMARC en PASS
 - [x] **P10** (C, 2026-11-03: los pedidos 16, 17 y 18, sin pagar, pasaron solos a "Cancelado" tras la reserva de stock de 60 min; el cron los salta con `status_not_payable`) Cancelación automática de pedidos sin pagar: crear un pedido, no pagarlo y comprobar que pasa a "Cancelado" (puede tardar 1 a 2 horas)
 - [x] **P11** (C, 2026-11-03: al volver del rechazo del pedido 21, Mercado Pago mandó `status=null` y `external_reference=WC-21`; la página mostró "Todavía no registramos tu pago…", Pedido N° 21, botón "Reintentar pago", y el carrito conservó los 3 productos) Retorno sin pagar: la dirección con `status=null` muestra "Todavía no registramos tu pago"
 

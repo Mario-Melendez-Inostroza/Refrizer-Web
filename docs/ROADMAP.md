@@ -13,7 +13,7 @@
 - [ ] **K3** (Cliente) Productos (10 a 25: fotos, descripción, precio con IVA, stock) y categorías
 - [ ] **K4** (Cliente) Textos legales (Términos, Cambios y devoluciones) y datos de contacto
 - [ ] **K5** (Cliente) Un **buzón de correo de su dominio** para el remitente de la tienda
-- [ ] **K6** (Cliente+M) Despacho: sin despacho (`shipping.enabled=false`) o con tarifas
+- [x] **K6** (M, 2026-11-03: **sin despacho por la página**; la clienta lo coordina por su cuenta. `shipping.enabled=false` y WooCommerce sin envío) Despacho: sin despacho (`shipping.enabled=false`) o con tarifas
 - [ ] **K7** (M) Integración de Mercado Pago creada (credenciales de **prueba** primero) y cuenta compradora de prueba
 
 ## 2. Servidor (playbook §2)
@@ -41,7 +41,7 @@
 - [x] **P3** (M+C, 2026-11-03: M cambió `TC_DRY_RUN` a `false` (config.php 1958→1959 bytes, 04:38 UTC, contenido no leído); cron 04:40 `dry_run=no vendedor=match`, `pedido=22 resultado=marked_paid pago=186416978247`; pedido "Procesando", nota "Conciliado por la función propia… monto 50 CLP", stock 9→8 una vez, correos «Procesando tu pedido» y «Nuevo pedido»; el 21 (rechazado) queda `no_approved_payment` y los cancelados `status_not_payable`) `TC_DRY_RUN=false` → `marked_paid` (Procesando, stock una vez, correos, nota). **Cambiar a Opus 5.5 antes de este paso**
 - [ ] **P4** (M+C) Idempotencia: pasadas siguientes sin cambios; ruta REST `already_paid`
 - [ ] **P5** (M+C) Pago sobre pedido cancelado → no se reactiva, un solo correo de revisión
-- [ ] **P6** (M) **Quitar el bloqueo del IPN** y verificar 400 (no 403) en `/wp/wc-api/WC_WooMercadoPago_Basic_Gateway/`
+- [x] **P6** (C, 2026-11-03: `wp/.htaccess` restaurado desde la copia, idéntico al original (551 bytes) y sin el bloque `TC-PRUEBA-P2`; el aviso da 400 por ruta y por `?wc-api=`; Store API 200 y `POST /tienda/v1/reconcile {}` → `not_found`) **Quitar el bloqueo del IPN** y verificar 400 (no 403) en `/wp/wc-api/WC_WooMercadoPago_Basic_Gateway/`
 - [ ] **P7** (C) Ruta REST: clave o correo erróneos y pedido inexistente dan `not_found`; repetir antes de 60 s → `try_later`
 - [~] **P8** (M+C, 2026-11-03: **rechazo probado**: pedido 21 con la Mastercard de prueba guardada en el comprador → Mercado Pago "No pudimos procesar tu pago"; el cron registra `no_approved_payment` (el pago se creó y se rechazó); el pedido sigue "Pendiente de pago", sin descontar stock. **Aprobación con tarjeta no lograda en sandbox** (igual que en el staging); se probará con tarjeta real en R2) **Pago con tarjeta de prueba aprobada** (titular `APRO`) y **pago rechazado** (`FUND` u `OTHE`): qué muestra `/pedido/retorno`, estado y stock del pedido, la conciliación no lo toca. Tarjetas y titulares: documentación de Mercado Pago (Checkout Pro > Realizar compras de prueba), en ventana de incógnito
 - [ ] **P9** (2026-11-03: **falla**: remitente actual es un Gmail y Gmail marca "no autenticado", van a spam. Falta buzón de refrizer.cl (K5) + SPF/DKIM/DMARC (S9) y cambiar el remitente en WooCommerce) (M+C) **Correos a la bandeja de entrada**: Gmail > Mostrar original con SPF, DKIM y DMARC en PASS

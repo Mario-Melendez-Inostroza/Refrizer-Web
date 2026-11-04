@@ -50,6 +50,8 @@
 
 ## 5. Paso a producción (playbook §4b) — dinero real
 
+> **Estado 2026-11-04 (probado en producción con la cuenta de M, "Tienda Prueba_56", NO la de la clienta):** compra real de $10 con tarjeta: **débito aprobado** (pedido #23), **crédito aprobado** (#26) y **rechazado** (#25). Retorno correcto en los tres casos; el rechazo mostraba "pendiente" y se corrigió (`e1e392f`). Devolución: no se probó (decisión de M). El plugin deja una **nota privada "Mercado Pago: pago … rechazado (motivo)"** en el pedido rechazado (`b848e89`; probado en el #25 con `TC_DRY_RUN=false`; no repetir la nota: probado solo con pruebas unitarias, 122 pasan). **Queda pendiente repetir R1 y una compra mínima con las 4 credenciales de la aplicación de la clienta.** Hoy `config.php` y el plugin apuntan a la cuenta de M y `TC_DRY_RUN=false`.
+
 - [ ] **R1** (M) Access Token de **producción** de la clienta en el plugin y en `config.php`; `TC_MP_SELLER_ID` nuevo; `TC_DRY_RUN=true`; `vendedor=match`. **Cambiar a Opus 5.5**
 - [ ] **R2** (M) **Una compra real de monto mínimo** con una cuenta o tarjeta distinta de la vendedora; verificar retorno, stock, correos y que el cron lee el pago real
 - [ ] **R3** (M) **Devolver ese pago** desde el panel de Mercado Pago (avisar a la clienta que la comisión podría no reintegrarse)

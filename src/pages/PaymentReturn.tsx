@@ -4,7 +4,7 @@ import { CheckCircle2, Clock, XCircle } from 'lucide-react'
 import { site } from '@/config/site'
 import { useCart } from '@/lib/cart'
 import { whatsappUrl } from '@/lib/format'
-import { returnedWithoutPayment } from '@/lib/return'
+import { returnedRejected, returnedWithoutPayment } from '@/lib/return'
 import { getOrderStatus, hasOrderAccess, lastOrderId, orderIdFromReference, reconcileSaysPaid, requestReconcile } from '@/services/orders'
 import type { OrderStatus } from '@/types'
 
@@ -19,6 +19,7 @@ const POLL_FAST_MS = 60_000
 const POLL_TOTAL_MS = 300_000
 const TIMED_OUT_TEXT = 'Tu pago está siendo confirmado, te avisaremos por correo.'
 /** Volvió de Mercado Pago sin pagar (el query solo elige el texto; el estado real sale del servidor). */
+const REJECTED = { title: 'Tu pago fue rechazado', text: 'No se realizó ningún cargo. Tu carrito sigue guardado: puedes intentarlo nuevamente con otra tarjeta u otro medio de pago.' }
 const NO_PAYMENT = { title: 'Todavía no registramos tu pago.', text: 'Si ya pagaste, espera unos minutos y pulsa "Actualizar estado". Si no, puedes intentarlo nuevamente.' }
 
 export default function PaymentReturn() {
@@ -113,17 +114,18 @@ export default function PaymentReturn() {
   }
 
   const noPayment = status === 'pending' && returnedWithoutPayment(query)
+  const rejected = status === 'pending' && returnedRejected(query)
   const st = STATES[status]
   const I = st.icon
   return shell(
     <div className="rounded-2xl border border-line bg-white p-8 text-center sm:p-10" role="status">
       <span className={`mx-auto grid size-16 place-items-center rounded-full ${st.color}`}><I className="size-8" aria-hidden="true" /></span>
-      <h1 className="mt-5 text-2xl font-bold text-navy-900">{noPayment ? NO_PAYMENT.title : st.title}</h1>
-      <p className="mt-3 text-muted">{noPayment ? NO_PAYMENT.text : status === 'pending' && timedOut ? TIMED_OUT_TEXT : st.text}</p>
+      <h1 className="mt-5 text-2xl font-bold text-navy-900">{rejected ? REJECTED.title : noPayment ? NO_PAYMENT.title : st.title}</h1>
+      <p className="mt-3 text-muted">{rejected ? REJECTED.text : noPayment ? NO_PAYMENT.text : status === 'pending' && timedOut ? TIMED_OUT_TEXT : st.text}</p>
       <p className="mt-3 text-xs text-muted">Pedido N° {id}</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
-        {(status === 'failed' || noPayment) && <Link to="/checkout" className="btn-orange">Reintentar pago</Link>}
-        {status === 'pending' && <button type="button" onClick={() => void refresh()} className="btn-orange">Actualizar estado</button>}
+        {(status === 'failed' || noPayment || rejected) && <Link to="/checkout" className="btn-orange">Reintentar pago</Link>}
+        {status === 'pending' && !rejected && <button type="button" onClick={() => void refresh()} className="btn-orange">Actualizar estado</button>}
         {status === 'paid' && <Link to="/productos" className="btn-orange">Seguir comprando</Link>}
         <a href={whatsappUrl(site.whatsapp.number, 'Hola, tengo una consulta sobre mi pedido.')} target="_blank" rel="noreferrer" className="btn-outline">Contactar por WhatsApp</a>
       </div>

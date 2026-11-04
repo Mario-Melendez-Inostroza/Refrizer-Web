@@ -14,7 +14,7 @@ Rama de trabajo: `integracion-motor`. `main` no se toca sin aprobación de Mario
 
 ## 2. Qué aporta el motor
 
-Código de referencia en `docs/referencia-plantilla/` (se porta, no se copia encima):
+Código de referencia en `docs/archivo/referencia-plantilla/` (se porta, no se copia encima):
 
 - Cliente de la Store API de WooCommerce (`/wp/wp-json/wc/store/v1`, mismo origen, `credentials: omit`, `Cart-Token`, parámetro único para esquivar la caché del hosting).
 - Creación del pedido (`/checkout`, método `woo-mercado-pago-basic`) y redirección a Mercado Pago Checkout Pro.

@@ -4,7 +4,7 @@ Sustituye al `.env.example` (no se pudo crear: la configuración local de permis
 
 **Arquitectura vigente (desde 2026-10-11): todo en BenzaHosting (cPanel).** React compilado en la raíz del dominio (`public_html/`), WordPress y WooCommerce en `public_html/wp/`, la conciliación como plugin de WordPress (`wordpress/tienda-conciliacion`) y un cron de cPanel por línea de comandos (`wordpress/cron/tc-cron.php`). **Vercel ya no se usa**: lo que se refiere a Vercel está al final, marcado como obsoleto.
 
-**Estado:** nada de esto se ha probado todavía en el hosting real. Está **NO PROBADO** hasta pasar la prueba obligatoria de `docs/nueva-tienda.md` (paso 5.6).
+**Estado:** nada de esto se ha probado todavía en el hosting real. Está **NO PROBADO** hasta pasar la prueba obligatoria de `docs/archivo/nueva-tienda.md` (paso 5.6).
 
 ## 1. Frontend (React)
 
@@ -61,7 +61,7 @@ Pasos originales en Vercel (**obsoletos**; se conservan como registro):
 1. Importar el repositorio. *Framework Preset:* Vite; *Build Command:* `npm run build`; *Output Directory:* `dist`.
 2. En *Settings > Environment Variables* crear, para **Production** y **Preview**: `WC_URL`, `WC_CONSUMER_KEY`, `WC_CONSUMER_SECRET`, `MP_ACCESS_TOKEN`, `RECONCILE_SECRET` y, si cambia, `ORDER_REFERENCE_PREFIX`.
 3. **No** crear `DRY_RUN` al principio (queda en modo simulación). Cuando una prueba real confirme que la conciliación hace lo esperado, crear `DRY_RUN=false`.
-4. En el plugin de Mercado Pago, poner `success_url`, `failure_url` y `pending_url` en `https://<dominio>/pedido/retorno`. (Esto **sigue vigente** en BenzaHosting: `docs/nueva-tienda.md` 4.8.)
+4. En el plugin de Mercado Pago, poner `success_url`, `failure_url` y `pending_url` en `https://<dominio>/pedido/retorno`. (Esto **sigue vigente** en BenzaHosting: `docs/archivo/nueva-tienda.md` 4.8.)
 5. Probar: `GET https://<dominio>/api/wc/products` debe devolver el catálogo; `POST /api/reconcile-pending` sin cabecera debe dar 401.
 
 ## Reglas
@@ -69,4 +69,4 @@ Pasos originales en Vercel (**obsoletos**; se conservan como registro):
 - Nunca pegues valores reales en el chat, en commits, en logs ni en mensajes de error.
 - `config.php` con el token **nunca** dentro de `public_html` ni en el repositorio.
 - Rota `TC_MP_ACCESS_TOKEN` si alguna vez se filtra (y revoca las claves REST que queden de pruebas).
-- Para una tienda nueva, ver `docs/nueva-tienda.md` (Fases 3 a 5).
+- Para una tienda nueva, ver `docs/archivo/nueva-tienda.md` (Fases 3 a 5).

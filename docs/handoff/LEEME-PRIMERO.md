@@ -6,14 +6,14 @@ Para que una sesión **nueva** de Claude Code entienda todo desde el primer mens
 
 | Archivo (en la copia) | Para qué sirve |
 |---|---|
-| `CLAUDE.md` | El briefing que Claude Code **lee solo** al abrir la carpeta: qué es el sistema, cómo trabajas tú, reglas duras, cómo verificar con Chrome, qué no se probó |
-| `docs/playbook-tienda-real.md` | La receta: orden de montaje, pruebas mínimas, paso a producción, correos, seguridad, errores ya cometidos |
+| `CLAUDE.md` | (corto) El briefing que Claude Code **lee solo** al abrir la carpeta: qué es el sistema, cómo trabajas tú, reglas duras, cómo verificar con Chrome, qué no se probó |
+| `docs/playbook-tienda-real.md` + `.claude/skills/` | El **índice** de la receta y las **skills** por fase (servidor, vincular Mercado Pago, frontend y despliegue, pruebas de pago, correos, Chrome/cPanel con snippets). Se cargan solo cuando hacen falta, para gastar menos tokens |
 | `docs/ROADMAP.md` | El roadmap **vacío** de la tienda nueva (se va marcando) |
 | `docs/DATOS-CLIENTA.md` | Formulario de datos de la clienta, sin credenciales |
 | `wordpress/` | El plugin de conciliación, el cron, la plantilla de `config.php` y sus pruebas (`wordpress/tests/correr-pruebas-sin-php.mjs` las corre sin tener PHP instalado) |
 | `src/`, `public/`, `package.json`… | La tienda React |
-| `docs/nueva-tienda.md`, `docs/variables-entorno.md` | Guías largas de apoyo |
-| `docs/archivo-staging/` | La historia del staging (roadmap con fechas, informe de la Fase 0). Solo consulta |
+| `docs/variables-entorno.md` | Significado de cada constante de `config.php` |
+| `docs/archivo/` | Solo consulta, no se lee por defecto: guía larga antigua (`nueva-tienda.md`), historia del staging y código de referencia del motor |
 | `docs/handoff/PRIMER-MENSAJE.md` | El mensaje para pegar en la primera sesión |
 
 **No se lleva:** `.env*`, `node_modules`, `dist`, `.git` ni nada que no esté commiteado. Los secretos del staging nunca estuvieron en el repo.

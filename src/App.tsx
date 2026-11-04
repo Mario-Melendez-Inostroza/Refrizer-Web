@@ -10,7 +10,6 @@ import PaymentReturn from '@/pages/PaymentReturn'
 import Services from '@/pages/Services'
 import About from '@/pages/About'
 import Contact from '@/pages/Contact'
-import Legal from '@/pages/Legal'
 import NotFound from '@/pages/NotFound'
 
 export default function App() {
@@ -28,8 +27,6 @@ export default function App() {
             <Route path="servicios" element={<Services />} />
             <Route path="nosotros" element={<About />} />
             <Route path="contacto" element={<Contact />} />
-            <Route path="terminos" element={<Legal page="terminos" />} />
-            <Route path="cambios-y-devoluciones" element={<Legal page="devoluciones" />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

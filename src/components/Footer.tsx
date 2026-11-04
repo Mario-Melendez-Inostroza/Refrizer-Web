@@ -16,7 +16,7 @@ export default function Footer() {
         <div>
           <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-white">Navegación</h2>
           <ul className="mt-4 space-y-2.5 text-sm">
-            {[['/productos', 'Productos'], ['/servicios', 'Servicios'], ['/nosotros', 'Nosotros'], ['/contacto', 'Contacto'], ['/carrito', 'Carrito'], ['/terminos', 'Términos y condiciones'], ['/cambios-y-devoluciones', 'Cambios y devoluciones']].map(([to, l]) => (
+            {[['/productos', 'Productos'], ['/servicios', 'Servicios'], ['/nosotros', 'Nosotros'], ['/contacto', 'Contacto'], ['/carrito', 'Carrito']].map(([to, l]) => (
               <li key={to}><Link to={to} className="hover:text-orange">{l}</Link></li>
             ))}
           </ul>

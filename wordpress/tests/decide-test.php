@@ -129,6 +129,15 @@ function fake( array $s ): array {
 			$st->calls[] = "checked:{$now}";
 		};
 	}
+	// Marca de "pago rechazado anotado": opcional (solo si la prueba lo pide), se anota como "rejmark:<ids>".
+	if ( ! empty( $s['rejected_dep'] ) ) {
+		$deps['mark_rejected'] = function ( int $id, string $ids ) use ( $s, $st ) {
+			if ( ! empty( $s['rejected_throws'] ) ) {
+				throw new RuntimeException( 'ECONNREFUSED secreto' );
+			}
+			$st->calls[] = "rejmark:{$ids}";
+		};
+	}
 	if ( empty( $s['no_log'] ) ) {
 		$deps['log'] = function ( string $message ) use ( $s, $st ) {
 			if ( ! empty( $s['log_throws'] ) ) {
@@ -293,6 +302,64 @@ t( 'TS 20: sin pago aprobado (rechazado, o de otro pedido como WC-310): sigue pe
 	list( $r, $st ) = run( array( 'payments' => array( payment( array( 'status' => 'rejected' ) ), payment( array( 'id' => 5, 'external_reference' => 'WC-310' ) ) ) ) );
 	eq( array( $r['result'], $r['reason'] ), array( 'pending', 'no_approved_payment' ) );
 	eq( writes( $st ), array() );
+} );
+
+function notes( $st ): array {
+	return array_values( array_filter( $st->calls, function ( $c ) {
+		return 0 === strpos( $c, 'note:' );
+	} ) );
+}
+
+t( 'pago rechazado: deja una nota con el motivo y marca el id; el pedido sigue pendiente', function () {
+	list( $r, $st ) = run( array( 'rejected_dep' => true, 'payments' => array( payment( array( 'id' => 555, 'status' => 'rejected', 'status_detail' => 'cc_rejected_bad_filled_security_code' ) ) ) ) );
+	eq( array( $r['result'], $r['reason'] ), array( 'pending', 'no_approved_payment' ) );
+	eq( $st->calls, array( 'lock', 'read', 'mp', 'rejmark:555', 'note:' . tc_rejected_note_text( '555', 'cc_rejected_bad_filled_security_code' ), 'unlock' ) );
+	ok( false !== strpos( tc_rejected_note_text( '555', 'cc_rejected_bad_filled_security_code' ), 'código de seguridad incorrecto' ), 'motivo en español' );
+	ok( false === array_search( 'complete', array_map( function ( $c ) { return explode( ':', $c )[0]; }, $st->calls ), true ), 'no completa el pedido' );
+} );
+
+t( 'pago rechazado ya anotado: no repite la nota ni la marca; uno nuevo sí', function () {
+	$rej = array( 'id' => 555, 'status' => 'rejected', 'status_detail' => 'cc_rejected_insufficient_amount' );
+	list( $r, $st ) = run( array( 'rejected_dep' => true, 'reads' => array( order( array( 'rejected_noted' => '555' ) ) ), 'payments' => array( payment( $rej ) ) ) );
+	eq( notes( $st ), array() );
+	eq( array_values( array_filter( $st->calls, function ( $c ) { return 0 === strpos( $c, 'rejmark:' ); } ) ), array() );
+	list( $r, $st ) = run( array( 'rejected_dep' => true, 'reads' => array( order( array( 'rejected_noted' => '555' ) ) ), 'payments' => array( payment( $rej ), payment( array( 'id' => 556, 'status' => 'rejected', 'status_detail' => '' ) ) ) ) );
+	eq( count( notes( $st ) ), 1 );
+	ok( in_array( 'rejmark:555,556', $st->calls, true ), 'la marca acumula los ids' );
+} );
+
+t( 'pago rechazado: en simulación, sin la dependencia, de otro pedido o aprobado, no escribe nada', function () {
+	$rej = payment( array( 'id' => 555, 'status' => 'rejected', 'status_detail' => 'cc_rejected_other_reason' ) );
+	list( , $st ) = run( array( 'rejected_dep' => true, 'payments' => array( $rej ) ), true );
+	eq( array( notes( $st ), writes( $st ) ), array( array(), array() ), 'simulación' );
+	list( , $st ) = run( array( 'payments' => array( $rej ) ) );
+	eq( notes( $st ), array(), 'sin la dependencia opcional' );
+	list( , $st ) = run( array( 'rejected_dep' => true, 'payments' => array( payment( array( 'id' => 9, 'status' => 'rejected', 'external_reference' => 'WC-310' ) ) ) ) );
+	eq( notes( $st ), array(), 'rechazo de otro pedido' );
+	list( $r, $st ) = run( array( 'rejected_dep' => true, 'payments' => array( $rej, payment( array( 'id' => 600 ) ) ) ) );
+	eq( $r['result'], 'marked_paid' );
+	eq( strpos( implode( '|', $st->calls ), 'rejmark' ), false, 'si hay un pago aprobado no se anota el rechazo' );
+} );
+
+t( 'pago rechazado: un fallo al anotar no cambia el resultado y solo registra un código', function () {
+	list( $r, $st ) = run( array( 'rejected_dep' => true, 'rejected_throws' => true, 'payments' => array( payment( array( 'id' => 555, 'status' => 'rejected' ) ) ) ) );
+	eq( array( $r['result'], $r['reason'] ), array( 'pending', 'no_approved_payment' ) );
+	eq( notes( $st ), array() );
+	eq( count( $st->logs ), 1 );
+	ok( false === strpos( $st->logs[0], 'secreto' ) && false === strpos( $st->logs[0], 'ECONNREFUSED' ), 'el registro no incluye el mensaje libre' );
+} );
+
+t( 'tc_rejected_payments: solo rechazados de la referencia; ids saneados; detalle sin caracteres raros', function () {
+	$list = array(
+		payment( array( 'id' => 1, 'status' => 'rejected', 'status_detail' => 'cc_rejected_high_risk' ) ),
+		payment( array( 'id' => 2, 'status' => 'approved' ) ),
+		payment( array( 'id' => 3, 'status' => 'rejected', 'external_reference' => 'WC-99' ) ),
+		payment( array( 'id' => '4<x>', 'status' => 'rejected', 'status_detail' => 'MAL; DROP' ) ),
+		'basura',
+	);
+	eq( tc_rejected_payments( $list, 'WC-31' ), array( '1' => 'cc_rejected_high_risk', '4x' => 'maldrop' ) );
+	ok( false !== strpos( tc_rejected_note_text( '9', '' ), 'motivo no informado' ), 'sin detalle' );
+	ok( false !== strpos( tc_rejected_note_text( '9', 'algo_nuevo' ), 'código algo_nuevo' ), 'código desconocido' );
 } );
 
 t( 'TS 21: si el aviso real llega mientras se concilia, no escribe', function () {

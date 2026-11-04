@@ -452,6 +452,44 @@ function tc_log_line( int $order_id, array $result, string $time ): string {
 	return '' === $pid ? $line : $line . ' pago=' . $pid;
 }
 
+/**
+ * Pagos rechazados de ESTE pedido (external_reference igual): id => status_detail. Solo sirven para dejar una nota
+ * informativa; nunca para decidir si el pedido está pagado.
+ */
+function tc_rejected_payments( array $payments, string $reference ): array {
+	$out = array();
+	foreach ( $payments as $p ) {
+		if ( ! is_array( $p ) || (string) ( $p['external_reference'] ?? '' ) !== $reference || ( $p['status'] ?? '' ) !== 'rejected' ) {
+			continue;
+		}
+		$id = preg_replace( '/[^0-9A-Za-z_-]/', '', (string) ( $p['id'] ?? '' ) );
+		if ( '' === $id ) {
+			continue;
+		}
+		$out[ $id ] = preg_replace( '/[^a-z_]/', '', strtolower( (string) ( $p['status_detail'] ?? '' ) ) );
+	}
+	return $out;
+}
+
+/** Texto de la nota de un pago rechazado: motivo en español para los códigos conocidos de Mercado Pago, o el código tal cual. */
+function tc_rejected_note_text( string $payment_id, string $detail ): string {
+	$known  = array(
+		'cc_rejected_insufficient_amount'     => 'fondos insuficientes',
+		'cc_rejected_bad_filled_security_code' => 'código de seguridad incorrecto',
+		'cc_rejected_bad_filled_date'         => 'fecha de vencimiento incorrecta',
+		'cc_rejected_bad_filled_other'        => 'datos de la tarjeta incorrectos',
+		'cc_rejected_bad_filled_card_number'  => 'número de tarjeta incorrecto',
+		'cc_rejected_call_for_authorize'      => 'el banco pide autorizar el pago',
+		'cc_rejected_card_disabled'           => 'tarjeta inactiva',
+		'cc_rejected_high_risk'               => 'rechazado por seguridad (antifraude)',
+		'cc_rejected_max_attempts'            => 'se superó el máximo de intentos',
+		'cc_rejected_duplicated_payment'      => 'pago duplicado',
+		'cc_rejected_other_reason'            => 'rechazado por el banco emisor',
+	);
+	$reason = '' === $detail ? 'motivo no informado' : ( $known[ $detail ] ?? 'código ' . $detail );
+	return sprintf( 'Mercado Pago: pago %s rechazado (%s). El pedido sigue pendiente de pago; el comprador puede reintentar.', $payment_id, $reason );
+}
+
 function tc_note_text( string $payment_id, $amount ): string {
 	return sprintf( 'Conciliado por la función propia: pago %s aprobado en Mercado Pago, monto %s CLP.', $payment_id, $amount );
 }

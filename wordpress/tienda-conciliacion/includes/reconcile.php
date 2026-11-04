@@ -50,6 +50,31 @@ function tc_mark_checked( array $deps, int $id, int $now ): void {
 }
 
 /**
+ * Deja una nota privada por cada pago RECHAZADO de este pedido que aún no se haya anotado (dependencia opcional
+ * 'mark_rejected'; sin ella no hace nada). Es informativa: no cambia el estado del pedido. La marca con los ids ya anotados
+ * se guarda ANTES de escribir las notas, así que ante un fallo se pierde una nota pero nunca se repite.
+ */
+function tc_note_rejected( array $deps, int $id, array $payments, string $reference, array $order ): void {
+	if ( ! isset( $deps['mark_rejected'] ) ) {
+		return;
+	}
+	try {
+		$rejected = tc_rejected_payments( $payments, $reference );
+		$known    = array_filter( explode( ',', (string) ( $order['rejected_noted'] ?? '' ) ), 'strlen' );
+		$fresh    = array_diff_key( $rejected, array_flip( $known ) );
+		if ( ! $fresh ) {
+			return;
+		}
+		$deps['mark_rejected']( $id, implode( ',', array_merge( $known, array_map( 'strval', array_keys( $fresh ) ) ) ) );
+		foreach ( $fresh as $payment_id => $detail ) {
+			$deps['add_note']( $id, tc_rejected_note_text( (string) $payment_id, $detail ) );
+		}
+	} catch ( \Throwable $e ) {
+		tc_log( $deps, sprintf( 'pedido #%d: no se pudo anotar el pago rechazado (%s)', $id, tc_exception_summary( $e ) ) );
+	}
+}
+
+/**
  * Concilia un pedido. $deps: lock, unlock, read_order, search_payments, complete, mark_reconciled, add_note, alert, now
  * y, opcionales, log y mark_checked.
  * Con $dry_run no escribe nada: ni el pago, ni notas, ni correos (el resultado dice qué habría hecho).
@@ -96,6 +121,10 @@ function tc_run_reconcile( int $id, bool $dry_run, string $prefix, array $deps, 
 			return array( 'result' => 'error', 'reason' => 'mp_error' );
 		}
 		$decision = $with_alert( tc_decide( $order, $payments, $prefix ), $order );
+		// Sin pago aprobado pero con pagos rechazados de este pedido: se deja constancia en una nota (no cambia el estado).
+		if ( ! $dry_run && 'pending' === $decision['result'] && 'no_approved_payment' === ( $decision['reason'] ?? '' ) ) {
+			tc_note_rejected( $deps, $id, $payments, $prefix . $id, $order );
+		}
 		// Cerrado y sin pago aprobado (status_not_payable): se anota la hora para no reconsultarlo en cada pasada.
 		if ( $closed && ! $dry_run && 'skipped' === $decision['result'] && 'status_not_payable' === ( $decision['reason'] ?? '' ) ) {
 			tc_mark_checked( $deps, $id, (int) $deps['now']() );
@@ -253,6 +282,8 @@ function tc_wp_read_order( int $id ): ?array {
 		'currency'       => $order->get_currency(),
 		'payment_method' => $order->get_payment_method(),
 		'alerted'        => (bool) $order->get_meta( '_tc_alerted', true ),
+		// Ids de pagos rechazados ya anotados en el pedido (separados por coma).
+		'rejected_noted' => (string) $order->get_meta( '_tc_rejected_noted', true ),
 		// Timestamp del último chequeo sin pago aprobado de un pedido cerrado (0 si nunca).
 		'closed_checked' => (int) $order->get_meta( '_tc_closed_checked', true ),
 	);
@@ -354,6 +385,9 @@ function tc_wp_deps(): array {
 		'alert'           => 'tc_wp_alert',
 		'now'             => 'time',
 		'log'             => 'tc_wp_log',
+		'mark_rejected'   => function ( int $id, string $ids ): void {
+			tc_wp_set_meta( $id, '_tc_rejected_noted', $ids );
+		},
 		'mark_checked'    => function ( int $id, int $now ): void {
 			tc_wp_set_meta( $id, '_tc_closed_checked', (string) $now );
 		},

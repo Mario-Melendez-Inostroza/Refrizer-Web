@@ -2,7 +2,7 @@
 
 > **Nota (copia para una tienda nueva):** en este proyecto `ROADMAP.md` es el de la tienda NUEVA. El estado y las fechas del staging están en `archivo-staging/ROADMAP-staging.md`; los datos de la clienta, en `DATOS-CLIENTA.md`.
 
-Solo lo que **se probó y funcionó** en el staging de BenzaHosting (2026-10-28 y 29). El estado vivo y los pendientes están en [ROADMAP.md](ROADMAP.md); la guía larga original, en [nueva-tienda.md](nueva-tienda.md).
+Solo lo que **se probó y funcionó**: en el staging de BenzaHosting (2026-10-28 y 29) y en la **primera tienda real, Refrizer** (2026-11-02 al 04; lo marcado *(Refrizer)* viene de ahí). El estado vivo y los pendientes están en [ROADMAP.md](ROADMAP.md); la guía larga original, en [nueva-tienda.md](nueva-tienda.md).
 
 **Quién:** **C** = Claude Code (repositorio y verificaciones de solo lectura en Chrome) · **M** = Mario (cPanel, WordPress, cuentas) · **Cliente** = la clienta.
 **Lo que Claude no hace aunque se lo pidan:** crear cuentas o contraseñas, cambios de DNS y de seguridad del servidor, borrar archivos o usuarios, restaurar respaldos. Esos pasos son de M.
@@ -21,7 +21,8 @@ Solo lo que **se probó y funcionó** en el staging de BenzaHosting (2026-10-28 
 
 - [ ] Hosting y dominio a nombre de ella; cuenta **vendedora** de Mercado Pago verificada (de ahí sale el Access Token de producción).
 - [ ] Comisión de Mercado Pago explicada y confirmada en su Simulador de comisiones.
-- [ ] Productos (10 a 25: fotos, descripción, precio con IVA, stock), textos legales (Términos, Cambios y devoluciones), datos de contacto.
+- [ ] Productos (10 a 25: fotos, descripción, precio con IVA, stock) y datos de contacto reales (teléfono, WhatsApp, correo, dirección). *(Refrizer)* Las **redes sociales que la clienta no tenga se quitan** del sitio (iconos y enlaces) en vez de dejar enlaces falsos.
+- [ ] **Textos legales** (Términos y condiciones, Cambios y devoluciones): **los entrega la clienta** (o su abogado). **No se redactan en el proyecto ni se publican textos base** (en Refrizer se hizo, M pidió quitarlos y se revirtió). Si M los cobra aparte, se publican cuando ella los apruebe; mientras tanto el sitio no tiene páginas legales y hay que decírselo a la clienta.
 - [ ] Un **buzón de correo de su propio dominio** para el remitente de la tienda (ver §5).
 - [ ] Decidir despacho: sin despacho (`shipping.enabled=false`, lo normal) o con tarifas.
 
@@ -31,6 +32,8 @@ Solo lo que **se probó y funcionó** en el staging de BenzaHosting (2026-10-28 
 2. CLP sin decimales, precios con IVA, envío desactivado, "Mantener stock" en 60 min, **zona horaria `America/Santiago`** (viene en UTC+0).
 3. PHP **8.3 o superior** en MultiPHP Manager. Comprobable sin entrar a cPanel: WooCommerce > Estado > Versión de PHP.
 4. Plugin oficial de Mercado Pago: **Checkout Pro, modo Redirect**. Abrir las opciones avanzadas y **guardar**. Poner las **tres URLs de retorno** (éxito, rechazo, pendiente) en `https://<dominio>/pedido/retorno`. Sin esto el comprador vuelve a la página de WordPress. Debug apagado al entregar.
+4b. **Vincular la cuenta de Mercado Pago en el plugin** *(Refrizer; versión con botón "Modificar cuenta")*: esta versión **no tiene un formulario suelto para pegar las credenciales de producción**. El camino manual es **WooCommerce > Mercado Pago > sección 1 > "Modificar cuenta" > país (Chile) > "En la cuenta de otra persona"**, que pide **las 4 credenciales juntas**: Public Key y Access Token de **producción** y de **prueba**, y **las cuatro deben ser de la MISMA aplicación de la MISMA cuenta**. Si se mezclan (producción de la clienta con prueba de otra cuenta, o de dos aplicaciones) sale el robot "No fue posible vincular la tienda". Se sacan del panel de desarrolladores: **Tus integraciones > elegir la aplicación (Checkout Pro) > Credenciales de producción / de prueba**; si la clienta no tiene aplicación, "Crear aplicación" (Checkout Pro) y activar las de producción (pide rubro y sitio web). Sin la contraseña de la clienta: M usa **"Solicitar acceso a credenciales"** con el correo de ella, ella acepta y la aplicación aparece en su lista. Quien pega los tokens es **M**, nunca Claude ni el chat. Revisión de Claude sin ver valores: los campos de producción empiezan con `APP_` y los de prueba con `TEST`; la sección 4 dice "Modo Ventas (Producción)" o "Modo Test".
+4c. **Las tarjetas no se pueden probar con credenciales de prueba** *(Refrizer)*: en el entorno de pruebas de Mercado Pago el pago con tarjeta **siempre sale rechazado** (también en el staging) y solo funciona con el saldo de una cuenta compradora de prueba. Con credenciales de prueba hay que usar el **vendedor de prueba** (su ID es el `TC_MP_SELLER_ID`); con una cuenta vendedora real y un comprador de prueba Mercado Pago responde "una de las partes es de prueba". Las pruebas con tarjeta se hacen **en producción con un monto mínimo** (ver la sección 4d).
 5. `config.php` **fuera de la web**, p. ej. `/home/USUARIO/tienda-secretos/config.php`, permisos **600**, cargado desde `wp-config.php` con `require_once` antes de `/* That's all, stop editing! */`:
    - `TC_MP_ACCESS_TOKEN`: el Access Token de producción.
    - `TC_MP_SELLER_ID`: el **ID de la cuenta vendedora**, que es el último grupo de números del Access Token (después del último guion). **No** es el *Client ID* ni el número de la aplicación.
@@ -57,6 +60,7 @@ Solo lo que **se probó y funcionó** en el staging de BenzaHosting (2026-10-28 
 1. C: editar `site.ts` y `site.json`; `npm test`; `npm run build:hosting`; buscar secretos en `dist/`.
 2. M: **antes de subir**, abrir el `.htaccess` del sitio en el servidor y conservar su bloque de cPanel (`# php -- BEGIN cPanel-generated handler`); subir **solo el contenido de `dist/`**, sin tocar `wp/`.
 2b. **Actualizar solo el JS** (cambios chicos, como el de P18): copia de `index.html` fuera de la web; subir el `index-<hash>.js` nuevo a `assets/` con cPanel > Administrador de archivos > Cargar (`upload-ajax.html?dir=<assets>`; el CSS y las imágenes con el mismo nombre ya están); cambiar en `index.html` solo la referencia al JS; comprobar `/` y `/pedido/retorno`.
+2c. **Reemplazar un archivo que ya existe en el servidor (plugin PHP, `index.html`…)** *(Refrizer)*: (1) respaldar leyendo con `get_file_content` y guardando con `save_file_content` en `/home/USUARIO/tienda-cron/backup-AAAAMMDD-<nombre>.txt`, y comprobar que el tamaño coincide; (2) subir con `upload-ajax.html?dir=<carpeta>` y `file_upload`: **si el archivo existe, cPanel pregunta "Overwrite File?" y hay que confirmar con "Yes"**; sin eso no se reemplaza y el tamaño no cambia; (3) con `list_files` comprobar que el tamaño es **exactamente** el del archivo local (lo que ya estaba en el servidor puede tener saltos de línea CRLF por haberse subido desde Windows: la diferencia con el repositorio es normal) y que los permisos siguen en 0644; (4) con varios archivos PHP que dependen entre sí, subir primero el que define las funciones nuevas; (5) esperar un barrido del cron y comprobar que sigue en `vendedor=match` y sin errores.
 3. Comprobar (C, solo lectura): `/pedido/retorno` y `/producto/x` devuelven la tienda (no 404); `index.html` con `no-cache`; `/assets/*` con `immutable`; cabeceras HSTS, `X-Frame-Options`, `Referrer-Policy`, `nosniff` en `/`, la Store API y `wp-login`.
 
 ## 4. Pruebas mínimas antes de abrir (las que pasaron en el staging)
@@ -84,9 +88,24 @@ Las pruebas de la sección 4 se hacen **primero con credenciales y cuentas de pr
 - Todas las compras del staging fueron con **saldo de Mercado Pago** (`payment_type=account_money` en la dirección de retorno). **Sin probar:** pago con tarjeta (crédito y débito), pago **rechazado** (retorno con `status=rejected`: ¿qué muestra `/pedido/retorno`?), y pagos **pendientes o en proceso**. Antes de abrir, probar al menos un pago con **tarjeta de prueba aprobada** y uno **rechazado**, con las credenciales de prueba de la clienta.
 - La conciliación solo actúa sobre pagos `approved`; los pendientes o rechazados no los toca (comportamiento esperado, no probado en vivo).
 
+## 4d. Pruebas reales con tarjeta en producción *(Refrizer, 2026-11-03: funcionó)*
+
+Se hicieron con **la cuenta de M como vendedora temporal** (credenciales de su aplicación) y su propia tarjeta; después se vuelve a vincular la cuenta de la clienta (4b + `config.php`) y se repite **una** compra mínima en la suya. Productos de prueba a **$10** (Mercado Pago **sí acepta cobros de $10**).
+
+- **Cómo pagar sin que cuente como "pagarse a uno mismo":** ventana de **incógnito**, **sin iniciar sesión en Mercado Pago** (pagar como invitado con la tarjeta) y, en el checkout de la tienda, un **correo distinto** al de la cuenta de Mercado Pago.
+- **Antes de pagar:** `config.php` con el Access Token de producción y el `TC_MP_SELLER_ID` del vendedor vinculado, **`TC_DRY_RUN=true`** y el barrido en `dry_run=si vendedor=match`. Ojo: `vendedor=match` solo dice que el token y el ID **coinciden entre sí**, no de qué cuenta son; eso lo confirma el pago apareciendo en el panel de esa cuenta.
+- **Resultados observados:**
+  - **Aprobado, débito (#23) y crédito (#26):** el aviso (IPN) llegó solo; pedido en **Procesando**, notas "Mercado Pago: Pago aprobado" y "Pago completado", stock -1, correos "Nuevo pedido" y "Procesando tu pedido", y `/pedido/retorno` con "¡Pago recibido!".
+  - **Rechazado (#25):** el pedido queda **Pendiente de pago**, con el stock reservado 60 min y, si nadie reintenta, WooCommerce lo cancela solo.
+  - El cron los distingue: pedido rechazado = `pending / no_approved_payment`; pedido que nunca llegó a pagar = `pending / no_payments_found`.
+- **La devolución no se probó** (M decidió no devolver los $10). Anotarlo como no probado; si hace falta, desde el panel de Mercado Pago (Actividad > pago > Devolver dinero).
+- **`/pedido/retorno` en un rechazo** *(error encontrado y corregido)*: la URL trae `status=rejected`, pero el pedido sigue "pendiente" en WooCommerce, así que la pantalla decía "Pago pendiente de confirmación". Ahora `src/lib/return.ts` (`returnedRejected`) elige el texto "Tu pago fue rechazado" con icono rojo y "Reintentar pago". **El query solo elige el texto; el estado real sale del servidor** (el comprador controla el query). En una tienda nueva, probar el rechazo y mirar qué dice la pantalla.
+- **Cómo ve el cliente un pedido rechazado o pendiente** (es lo primero que preguntará): el plugin `tienda-conciliacion` deja, **solo con `TC_DRY_RUN=false`**, una **nota privada** "Mercado Pago: pago N rechazado (motivo). El pedido sigue pendiente de pago; el comprador puede reintentar." (motivos en español para los códigos `cc_rejected_*`; una nota por pago, sin repetir). Guía para el cliente: **Procesando** = pagado, se despacha; **Pendiente con nota de rechazo** = el banco rechazó, puede reintentar o se cancela solo; **Pendiente sin notas de Mercado Pago** = empezó a pagar y no terminó. Las notas están en el pedido, columna derecha. **Solo se despacha lo que está en Procesando.** Sin la nota, WooCommerce no deja ninguna señal del rechazo: el motivo exacto solo estaría en Mercado Pago > Actividad.
+
 ## 5. Correos (el problema que más tiempo costó)
 
 - El remitente de WooCommerce **nunca** debe ser un Gmail: Gmail lo trata como suplantación (DMARC FAIL) y manda todo a spam. Debe ser un buzón del dominio de la clienta, creado en su cPanel.
+- *(Refrizer)* **El buzón se crea desde el cPanel de la clienta** (Cuentas de correo > Crear), p. ej. `ventas@dominio`; M define la contraseña y la clienta puede cambiarla después. Sirve también como correo de contacto del sitio (`site.email`) y como remitente de WooCommerce (nombre del remitente = la marca). Prueba: un pedido de prueba debe llegar a la **bandeja de entrada** de Gmail, no a spam. No inventar direcciones: si no existe el buzón, se crea o se le pide a la clienta.
 - cPanel > Entregabilidad del correo: SPF, DKIM y DMARC en "Valid" (M instala los registros sugeridos; el DMARC `p=none` es el más suave).
 - Verificación: en Gmail, "Mostrar original" del correo de una compra de prueba: **SPF, DKIM y DMARC en PASS**. Un dominio nuevo puede seguir en spam un tiempo aunque pase todo.
 
@@ -98,6 +117,14 @@ Las pruebas de la sección 4 se hacen **primero con credenciales y cuentas de pr
 - Actualizar el plugin de Mercado Pago justo antes de abrir: se actualiza **antes** de las pruebas, o se repiten.
 - Hacer ráfagas de peticiones a un sitio con Imunify360: aparece el desafío "Espere mientras se verifica su solicitud…". Una página a la vez.
 - La zona horaria de WordPress en UTC+0 (notas y correos con 3 o 4 horas de diferencia).
+- *(Refrizer)* **Credenciales de dos cuentas mezcladas** al vincular (producción de una y prueba de otra): "No fue posible vincular la tienda".
+- *(Refrizer)* Probar tarjetas con credenciales de prueba: siempre se rechazan; hay que pagar de verdad (monto mínimo).
+- *(Refrizer)* Creer que `vendedor=match` prueba que el token es de la cuenta correcta: solo prueba que token e ID coinciden.
+- *(Refrizer)* Dejar el plugin apuntando a la cuenta de pruebas de M (con `TC_DRY_RUN=false`) cuando ya hay productos reales: el dinero llega a M. Probar con productos de $10 y **volver a vincular la cuenta de la clienta antes de abrir**.
+- *(Refrizer)* Poner la tienda en "Próximamente" mientras se prueba: el aviso de Mercado Pago se pierde (502) y el pedido queda pendiente; el cron lo rescata a los 5 min, pero no debe pasar.
+- *(Refrizer)* Un `sed` demasiado amplio al corregir una prueba cambió otras pruebas existentes: revisar `git diff` (solo líneas añadidas) antes de dar por buena una corrección.
+- *(Refrizer)* Mostrar la categoría "Sin categorizar" de WooCommerce en la portada: el frontend la filtra (`uncategorized` / `sin-categorizar`).
+- *(Refrizer)* Redactar textos legales sin que la clienta los entregue: no se hace (ver §1).
 - La tienda de WordPress con su tema queda pública en `/wp/` y se puede comprar ahí; decidir si se redirige (sin tocar `wp-json`, `wc-api`, `wp-admin` ni `wp-login.php`).
 
 ## 6b. Cómo verificar rápido con Chrome (para Claude)
@@ -105,7 +132,16 @@ Las pruebas de la sección 4 se hacen **primero con credenciales y cuentas de pr
 - Claude solo ve las pestañas de su propio grupo de Chrome: si "no hay grupo", abrir uno nuevo y que M arrastre las pestañas que haga falta. **Una página a la vez**: ráfagas de peticiones activan el anti-bot.
 - En cPanel, la API de archivos funciona por GET/POST con la sesión abierta: `/cpsessXXXX/execute/Fileman/get_file_content`, `save_file_content` y `list_files` (la API de cron **no existe**; usar el formulario). `config.php` no se abre nunca: solo metadatos con `list_files`.
 - Lo que Claude **no** hace aunque se lo pidan: cambios de DNS, crear cuentas o contraseñas, borrar archivos o usuarios, restaurar respaldos, activar ajustes de seguridad del servidor. Esos pasos los hace M siguiendo esta guía.
+- *(Refrizer)* **Trucos que funcionaron:**
+  - Navegar y ejecutar JS en llamadas **separadas** (si la página cambia de dominio durante el script, la herramienta lo bloquea). Las salidas que parezcan cookies o consultas se bloquean: reemplazar `=` por `~`.
+  - La sesión de cPanel (`cpsessNNNN`) caduca y el grupo de pestañas de Claude desaparece a veces: crear grupo con `createIfEmpty`, que M inicie sesión él mismo, y no cerrar la última pestaña del grupo.
+  - Con una pestaña de WordPress abierta (sesión de M) se pueden **leer pedidos y notas y editar productos** con `fetch` a `/wp/wp-json/wc/v3/...` (POST para actualizar) con el nonce `wpApiSettings.nonce` o `admin-ajax.php?action=rest-nonce`; 1,5 s entre llamadas.
+  - El catálogo público se ve fresco con `?_x<timestamp>` (el hosting cachea por URL).
+  - Para esperar un barrido del cron: `computer wait` y `get_file_content` de `registro.txt` (el cron arranca con unos segundos de retraso; el registro está en UTC, Chile = UTC-3). Un `sleep` largo en la terminal está bloqueado.
+  - **Probar el plugin PHP sin PHP instalado** (el equipo de M no lo tiene): `wordpress/tests/correr-pruebas-sin-php.mjs` ejecuta `decide-test.php` con PHP 8.3 en WebAssembly (`npm i @php-wasm/node @php-wasm/universal` en una carpeta temporal **fuera del repositorio**). Las 122 pruebas pasaron así. Es PHP real pero **no** WordPress: sigue haciendo falta una compra real.
 
 ## 7. Lo que sigue sin probar
+
+**Ya probado en producción (Refrizer, 2026-11-03):** pago con tarjeta de **crédito y débito** aprobado, pago **rechazado**, y qué muestra `/pedido/retorno` en esos casos. **Sigue sin probarse:** la **devolución**, el pago **pendiente o en proceso** (efectivo u otros medios) y que la nota de rechazo **no se repita** en el servidor (solo con pruebas unitarias).
 
 IPN tardío tras conciliar, pedido reembolsado, monto distinto, `seller_mismatch`, dos crons a la vez, y que la caché del hosting respete `no-store` en `/order`. **Mario decidió no probar** el IPN tardío, el monto distinto, `seller_mismatch` ni los dos crons a la vez (2026-10-29): están cubiertos solo por las pruebas unitarias con dobles. Si alguna tienda mueve mucho dinero, conviene hacerlas antes de abrir. Detalle y fechas en [ROADMAP.md](ROADMAP.md).

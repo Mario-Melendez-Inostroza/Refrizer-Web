@@ -63,4 +63,4 @@
 
 - [ ] **E1** (M) Accesos entregados; la clienta sabe de la comisión y de sus límites
 - [ ] **E2** (M) Revisión semanal: pedidos "Pendiente de pago" cuyo pago figure aprobado en el panel de Mercado Pago; atender los correos de "revisar pago de Mercado Pago"
-- [ ] **E3** (C) Actualizar el playbook con lo que haya cambiado respecto de esta receta
+- [x] **E3** (C) Actualizar el playbook con lo que haya cambiado respecto de esta receta *(hecho 2026-11-04: playbook, CLAUDE.md y nueva-tienda.md; repetir al cerrar R1-R6 con la cuenta de la clienta)*

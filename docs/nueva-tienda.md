@@ -2,6 +2,8 @@
 
 Guía paso a paso, basada en el checklist y en la tabla de horas de `docs/fase0-informe.md` (§2 y §11).
 
+> **Actualización 2026-11-04 (primera tienda real, Refrizer):** esta guía es la versión larga y **el playbook (`playbook-tienda-real.md`) manda donde difieran**. Cambios que ya no están reflejados abajo: (1) los **textos legales los entrega la clienta**, no se redactan (paso 0.4 y 4.3); (2) en el paso 2.1 el plugin **no tiene formulario suelto de producción**: se vincula con *Modificar cuenta > "En la cuenta de otra persona"* y **4 credenciales de la misma aplicación** (playbook §2, 4b); (3) las **tarjetas no se prueban con credenciales de prueba**: se prueban en producción con $10 (playbook §4d); (4) la prueba 5.6 ya se hizo entera en una tienda real; (5) el rechazo de un pago deja el pedido "Pendiente" y el plugin ahora anota el motivo en el pedido; (6) el remitente de correo es un buzón del dominio de la clienta, creado en su cPanel.
+
 **Cómo leer los tiempos:** **todos son ESTIMADOS**. Se calcularon en la Fase 0 pero **no se midieron en una segunda tienda**, y Mario no entregó el desglose de sus horas de la Fase 0. Se muestran como "est." Los pasos de Claude Code también son estimados. La única cifra *medida* de esta guía es la demora del aviso de pago (1 s a 2 min 4 s, mediana 45,5 s, 8 medidas).
 
 **Quién:** **Cliente** (el dueño de la tienda), **Mario** (quien monta y vende el servicio) o **Claude Code** (el asistente de programación, en el repositorio).

@@ -10,7 +10,7 @@ Para que una sesión **nueva** de Claude Code entienda todo desde el primer mens
 | `docs/playbook-tienda-real.md` | La receta: orden de montaje, pruebas mínimas, paso a producción, correos, seguridad, errores ya cometidos |
 | `docs/ROADMAP.md` | El roadmap **vacío** de la tienda nueva (se va marcando) |
 | `docs/DATOS-CLIENTA.md` | Formulario de datos de la clienta, sin credenciales |
-| `wordpress/` | El plugin de conciliación, el cron, la plantilla de `config.php` y sus pruebas |
+| `wordpress/` | El plugin de conciliación, el cron, la plantilla de `config.php` y sus pruebas (`wordpress/tests/correr-pruebas-sin-php.mjs` las corre sin tener PHP instalado) |
 | `src/`, `public/`, `package.json`… | La tienda React |
 | `docs/nueva-tienda.md`, `docs/variables-entorno.md` | Guías largas de apoyo |
 | `docs/archivo-staging/` | La historia del staging (roadmap con fechas, informe de la Fase 0). Solo consulta |
@@ -45,3 +45,5 @@ Copia la carpeta del proyecto **sin** `.git`, `node_modules`, `dist` ni archivos
 ## Mantener esto al día
 
 Si aprendes algo nuevo en la tienda real que cambie la receta, se actualiza `docs/playbook-tienda-real.md` de ese proyecto (tarea E3 del roadmap). Para que lo aprendido vuelva a la plantilla, se copia el playbook de vuelta a este proyecto.
+
+**Qué se lleva de vuelta a la plantilla tras cada tienda** (la de Refrizer, 2026-11-04, ya está volcada en estos archivos): `CLAUDE.md` (sección "Lo aprendido en la primera tienda real"), `docs/playbook-tienda-real.md`, `docs/nueva-tienda.md` (aviso de cambios), y los cambios de `wordpress/` y `src/` que no sean de la marca (p. ej. el texto de rechazo en `src/pages/PaymentReturn.tsx` y `src/lib/return.ts`, y la nota de rechazo del plugin). Lo específico de la clienta (`src/config/site.ts`, imágenes, `docs/ROADMAP.md`, `docs/DATOS-CLIENTA.md`) **no** se lleva.

@@ -50,7 +50,7 @@ Este proyecto es una **copia de la plantilla** que ya se probó entera en un sta
 
 - Habla **español de Chile**. Respuestas claras y concretas; sin jerga innecesaria.
 - Quiere que **hagas tú todo lo que puedas** (con Chrome, el repo y el servidor). Para lo que **solo él** puede hacer, dale el **paso a paso exacto** (dónde hacer clic, qué escribir, qué esperar ver), no una lista de tareas vaga.
-- **Avísale antes de que cambie de modelo o de esfuerzo.** Él ejecuta `/model`; tú no puedes. Por defecto basta **Sonnet 5.5 en esfuerzo medio**. Pídele **Opus 5.5** solo en: (a) el momento de poner `TC_DRY_RUN = false` por primera vez y la primera conciliación real, (b) el paso a credenciales de producción, (c) depurar un fallo de pagos que no se entiende.
+- **Avísale antes de que cambie de modelo o de esfuerzo.** Él ejecuta `/model`; tú no puedes. Por defecto basta **Sonnet 5.5 en esfuerzo medio** (en Refrizer Sonnet bastó incluso para cambiar el plugin de conciliación y depurar el retorno de pagos; Opus se usó solo en el paso a credenciales). Pídele **Opus 5.5** solo en: (a) el momento de poner `TC_DRY_RUN = false` por primera vez y la primera conciliación real, (b) el paso a credenciales de producción, (c) depurar un fallo de pagos que no se entiende.
 - **No inventes direcciones de correo ni cuentas** en el dominio de la clienta. Si hace falta un buzón, se le pide a ella o se le indica a Mario cómo crearlo.
 - Pregunta antes de cualquier acción difícil de revertir o que salga al exterior (borrar, enviar un mensaje, tocar DNS, comprar, cambiar credenciales).
 - Cuando termines un bloque: actualiza `docs/ROADMAP.md`, haz el commit (mensaje en español, con la línea de coautoría que indique el sistema) y resume qué quedó verificado y qué no.
@@ -69,6 +69,18 @@ Este proyecto es una **copia de la plantilla** que ya se probó entera en un sta
 - **Las URLs de retorno** del plugin de Mercado Pago (éxito, rechazo y pendiente) deben ser `https://<dominio>/pedido/retorno`. Sin eso el comprador vuelve a la página de WordPress.
 - **El remitente de correos** de WooCommerce nunca es un Gmail: debe ser un buzón del dominio de la clienta, con SPF, DKIM y DMARC en PASS (se verifica con "Mostrar original" en Gmail). Si no, todo va a spam.
 
+## Lo aprendido en la primera tienda real (Refrizer, 2026-11) — aplícalo desde el día 1
+
+- **Los textos legales los entrega la clienta.** No los redactes ni publiques "texto base": en Refrizer se hizo y Mario pidió quitarlos. Se avisa a la clienta y se publican cuando ella los entregue.
+- **Vincular la cuenta de Mercado Pago:** en el plugin no hay formulario suelto de producción. Es *Modificar cuenta > país > "En la cuenta de otra persona"* y pide **4 credenciales de la MISMA aplicación y cuenta** (producción y prueba). Mezclar cuentas da "No fue posible vincular". **Pega los tokens Mario**, nunca tú. Detalle en el playbook §2 (4b).
+- **Las tarjetas no se prueban en sandbox** (siempre rechazan). Se prueban **en producción con $10**, en incógnito, **sin iniciar sesión en Mercado Pago** y con un correo distinto al de la cuenta (playbook §4d). Mario puede usar su propia cuenta como vendedora temporal y luego **volver a vincular la de la clienta antes de abrir**.
+- **`vendedor=match` no prueba que el token sea de la cuenta correcta**, solo que token e ID coinciden. Se confirma viendo el pago en el panel de esa cuenta.
+- **Pedido rechazado = "Pendiente de pago" y sin ninguna señal en WooCommerce.** El cliente preguntará cómo distinguirlo: el plugin deja una nota privada "pago rechazado (motivo)" (solo con `TC_DRY_RUN=false`). Solo se despacha lo que está en **Procesando**. `/pedido/retorno` con `status=rejected` debe decir "Tu pago fue rechazado": el query solo elige el texto, el estado sale del servidor.
+- **Reemplazar archivos del servidor:** copia previa leyendo/guardando en `tienda-cron`, subir con confirmación "Overwrite File? Yes", y comprobar el tamaño exacto (playbook §3, 2c). Con archivos PHP que dependen entre sí, sube primero el que define las funciones.
+- **Sin PHP en el equipo:** `wordpress/tests/correr-pruebas-sin-php.mjs` corre las pruebas del plugin con PHP en WebAssembly (instrucciones en el archivo). Tras cambiar el plugin, **compara `git diff`** y confirma que solo hay líneas añadidas en las pruebas existentes.
+- **Contacto real y sin redes falsas:** teléfono/WhatsApp/correo reales; quita iconos y enlaces de redes que la clienta no tenga; el buzón del remitente se crea en el cPanel de la clienta.
+- **Pedidos y productos de prueba:** a $10, con "(borrar)" en el nombre; se borran en R5 antes de abrir.
+
 ## Cómo verificar con Chrome (herramientas `mcp__claude-in-chrome__*`)
 
 - Carga las herramientas en **una sola** llamada a ToolSearch (navigate, tabs_context_mcp, tabs_create_mcp, javascript_tool, get_page_text, find, form_input, computer, file_upload, tabs_close_mcp).
@@ -84,8 +96,8 @@ El hosting cachea los GET por URL durante minutos. Para leer algo fresco agrega 
 
 ## Qué NO se probó en el staging (y por qué)
 
-El IPN tardío tras conciliar, `seller_mismatch`, monto distinto y dos crons a la vez: **decisión de Mario de no probarlos** (casos raros, cubiertos por pruebas unitarias). **Sí falta probar en la tienda real:** pago con **tarjeta** y pago **rechazado** (en el staging todo fue con saldo de Mercado Pago), y qué muestra `/pedido/retorno` en cada caso.
+El IPN tardío tras conciliar, `seller_mismatch`, monto distinto y dos crons a la vez: **decisión de Mario de no probarlos** (casos raros, cubiertos por pruebas unitarias). **Ya probado en producción (Refrizer, 2026-11-03, con la cuenta de Mario como vendedora temporal):** pago con tarjeta de crédito y de débito aprobado, pago rechazado y qué muestra `/pedido/retorno` en cada caso. **Sigue sin probarse:** la **devolución**, el pago **pendiente/en proceso** (efectivo u otros medios) y que la nota de rechazo no se repita en el servidor. En cada tienda nueva hay que repetir una compra mínima con la cuenta real de la clienta.
 
 ## Comandos del proyecto
 
-`npm test` · `npx tsc --noEmit` · `npm run build:hosting` (no `npm run build`) · `php wordpress/tests/decide-test.php` (si hay PHP disponible; en el equipo de Mario no lo había).
+`npm test` · `npx tsc --noEmit` · `npm run build:hosting` (no `npm run build`) · `php wordpress/tests/decide-test.php` (en el equipo de Mario no hay PHP: usar `wordpress/tests/correr-pruebas-sin-php.mjs`, 122 pruebas).

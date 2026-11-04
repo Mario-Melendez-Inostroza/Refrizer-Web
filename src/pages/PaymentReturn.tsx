@@ -115,7 +115,7 @@ export default function PaymentReturn() {
 
   const noPayment = status === 'pending' && returnedWithoutPayment(query)
   const rejected = status === 'pending' && returnedRejected(query)
-  const st = STATES[status]
+  const st = rejected ? STATES.failed : STATES[status]
   const I = st.icon
   return shell(
     <div className="rounded-2xl border border-line bg-white p-8 text-center sm:p-10" role="status">

@@ -4,6 +4,8 @@
  * Va en la RAÍZ del sitio (public_html/sitemap.php), junto a index.html y a la carpeta wp/.
  *
  * - Rutas fijas (portada, servicios, cobertura...): las lee de sitemap-paginas.json, que genera el build de la tienda.
+ *   Opciones de ese JSON: "categorias": false = no agregar las categorías de WooCommerce (la tienda tiene categorías fijas);
+ *   "productoEnCategorias": ["slug", ...] = listar solo los productos que estén en alguna de esas categorías de WooCommerce.
  * - Productos y categorías: los lee de WooCommerce, así que se actualiza solo cuando la clienta agrega o quita productos.
  *
  * No toca la base de datos más allá de leer; no depende de ningún plugin de SEO.
@@ -20,6 +22,8 @@ require $tc_wp_load;
 $tc_json    = is_file( __DIR__ . '/sitemap-paginas.json' ) ? json_decode( (string) file_get_contents( __DIR__ . '/sitemap-paginas.json' ), true ) : null;
 $tc_origin  = rtrim( is_array( $tc_json ) && ! empty( $tc_json['origin'] ) ? (string) $tc_json['origin'] : 'https://' . preg_replace( '/[^a-z0-9.-]/i', '', (string) ( $_SERVER['HTTP_HOST'] ?? '' ) ), '/' );
 $tc_paginas = is_array( $tc_json ) && ! empty( $tc_json['paginas'] ) && is_array( $tc_json['paginas'] ) ? $tc_json['paginas'] : array( '/' );
+$tc_categorias = ! is_array( $tc_json ) || ! array_key_exists( 'categorias', $tc_json ) || (bool) $tc_json['categorias'];
+$tc_solo_cats  = is_array( $tc_json ) && ! empty( $tc_json['productoEnCategorias'] ) && is_array( $tc_json['productoEnCategorias'] ) ? array_map( 'strval', $tc_json['productoEnCategorias'] ) : null;
 
 function tc_xml( string $text ): string {
 	return htmlspecialchars( $text, ENT_XML1 | ENT_QUOTES, 'UTF-8' );
@@ -44,7 +48,7 @@ foreach ( $tc_paginas as $tc_path ) {
 }
 
 // Categorías con productos (se omite la categoría "Sin categorizar" de WooCommerce).
-if ( function_exists( 'get_terms' ) ) {
+if ( $tc_categorias && function_exists( 'get_terms' ) ) {
 	$tc_terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true ) );
 	if ( is_array( $tc_terms ) ) {
 		foreach ( $tc_terms as $tc_term ) {
@@ -61,6 +65,10 @@ if ( function_exists( 'wc_get_products' ) ) {
 	$tc_productos = wc_get_products( array( 'status' => 'publish', 'limit' => -1, 'return' => 'objects' ) );
 	foreach ( (array) $tc_productos as $tc_p ) {
 		if ( 'hidden' === $tc_p->get_catalog_visibility() ) {
+			continue;
+		}
+		// La tienda solo muestra los productos de ciertas categorías: el resto no se lista (la página daría "no encontrado").
+		if ( null !== $tc_solo_cats && ! has_term( $tc_solo_cats, 'product_cat', $tc_p->get_id() ) ) {
 			continue;
 		}
 		$tc_mod   = $tc_p->get_date_modified();

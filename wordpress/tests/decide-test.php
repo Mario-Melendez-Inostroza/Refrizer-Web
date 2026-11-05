@@ -138,6 +138,15 @@ function fake( array $s ): array {
 			$st->calls[] = "rejmark:{$ids}";
 		};
 	}
+	// Marca de "pedido sin ningún intento de pago anotado": opcional (solo si la prueba lo pide), se anota como "abmark:<hora>".
+	if ( ! empty( $s['abandoned_dep'] ) ) {
+		$deps['mark_abandoned'] = function ( int $id, int $now ) use ( $s, $st ) {
+			if ( ! empty( $s['abandoned_throws'] ) ) {
+				throw new RuntimeException( 'ECONNREFUSED secreto' );
+			}
+			$st->calls[] = "abmark:{$now}";
+		};
+	}
 	if ( empty( $s['no_log'] ) ) {
 		$deps['log'] = function ( string $message ) use ( $s, $st ) {
 			if ( ! empty( $s['log_throws'] ) ) {
@@ -360,6 +369,43 @@ t( 'tc_rejected_payments: solo rechazados de la referencia; ids saneados; detall
 	eq( tc_rejected_payments( $list, 'WC-31' ), array( '1' => 'cc_rejected_high_risk', '4x' => 'maldrop' ) );
 	ok( false !== strpos( tc_rejected_note_text( '9', '' ), 'motivo no informado' ), 'sin detalle' );
 	ok( false !== strpos( tc_rejected_note_text( '9', 'algo_nuevo' ), 'código algo_nuevo' ), 'código desconocido' );
+} );
+
+t( 'pedido sin ningún intento de pago tras 15 min: una nota y una marca; el pedido sigue pendiente', function () {
+	list( $r, $st ) = run( array( 'abandoned_dep' => true, 'payments' => array() ) );
+	eq( array( $r['result'], $r['reason'] ), array( 'pending', 'no_payments_found' ) );
+	eq( $st->calls, array( 'lock', 'read', 'mp', 'abmark:' . TC_TEST_NOW, 'note:' . tc_abandoned_note_text(), 'unlock' ) );
+} );
+
+t( 'pedido sin ningún intento de pago: no anota si es reciente, si ya se anotó, en simulación, sin la dependencia o si hay pagos rechazados', function () {
+	list( , $st ) = run( array( 'abandoned_dep' => true, 'reads' => array( order( array( 'created' => TC_TEST_NOW - 899 ) ) ), 'payments' => array() ) );
+	eq( notes( $st ), array(), 'reciente (899 s)' );
+	list( , $st ) = run( array( 'abandoned_dep' => true, 'reads' => array( order( array( 'created' => TC_TEST_NOW - 900 ) ) ), 'payments' => array() ) );
+	eq( count( notes( $st ) ), 1, 'justo a 900 s' );
+	list( , $st ) = run( array( 'abandoned_dep' => true, 'reads' => array( order( array( 'abandoned_noted' => true ) ) ), 'payments' => array() ) );
+	eq( notes( $st ), array(), 'ya anotado' );
+	list( , $st ) = run( array( 'abandoned_dep' => true, 'payments' => array() ), true );
+	eq( array( notes( $st ), writes( $st ) ), array( array(), array() ), 'simulación' );
+	list( , $st ) = run( array( 'payments' => array() ) );
+	eq( notes( $st ), array(), 'sin la dependencia opcional' );
+	list( , $st ) = run( array( 'abandoned_dep' => true, 'payments' => array( payment( array( 'id' => 555, 'status' => 'rejected' ) ) ) ) );
+	eq( strpos( implode( '|', $st->calls ), 'abmark' ), false, 'con un pago rechazado no es "sin intento de pago"' );
+} );
+
+t( 'pedido sin ningún intento de pago: un fallo al anotar no cambia el resultado y solo registra un código', function () {
+	list( $r, $st ) = run( array( 'abandoned_dep' => true, 'abandoned_throws' => true, 'payments' => array() ) );
+	eq( array( $r['result'], $r['reason'] ), array( 'pending', 'no_payments_found' ) );
+	eq( notes( $st ), array() );
+	eq( count( $st->logs ), 1 );
+	ok( false === strpos( $st->logs[0], 'secreto' ) && false === strpos( $st->logs[0], 'ECONNREFUSED' ), 'el registro no incluye el mensaje libre' );
+} );
+
+t( 'tc_abandoned_due: umbral de 900 s y fechas no legibles', function () {
+	eq( tc_abandoned_due( array( 'created' => 1000 ), 1899 ), false );
+	eq( tc_abandoned_due( array( 'created' => 1000 ), 1900 ), true );
+	eq( tc_abandoned_due( array( 'created' => null ), 99999 ), false );
+	eq( tc_abandoned_due( array( 'created' => 0 ), 99999 ), false );
+	eq( tc_abandoned_due( array(), 99999 ), false );
 } );
 
 t( 'TS 21: si el aviso real llega mientras se concilia, no escribe', function () {

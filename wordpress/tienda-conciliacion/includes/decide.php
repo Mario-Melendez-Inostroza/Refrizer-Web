@@ -22,6 +22,8 @@ const TC_PAID = array( 'processing', 'completed' );
 const TC_CLOSED = array( 'cancelled', 'refunded', 'failed' );
 /** Segundos que un pago puede ser anterior a la creación del pedido y aun así considerarse suyo (desfase de relojes). */
 const TC_ORDER_DATE_SKEW = 300;
+/** Segundos que un pedido pendiente debe llevar sin ningún intento de pago en Mercado Pago para dejar la nota de "pago no completado". */
+const TC_ABANDONED_MIN_AGE = 900;
 
 /**
  * Interpreta una fecha de Mercado Pago como timestamp. Exige formato ISO 8601 completo con zona horaria (Z o ±hh:mm):
@@ -469,6 +471,20 @@ function tc_rejected_payments( array $payments, string $reference ): array {
 		$out[ $id ] = preg_replace( '/[^a-z_]/', '', strtolower( (string) ( $p['status_detail'] ?? '' ) ) );
 	}
 	return $out;
+}
+
+/**
+ * ¿Toca anotar que el pedido no tiene ningún intento de pago? Solo si lleva al menos $min_age segundos creado (el comprador puede
+ * estar todavía en la pantalla de pago). Sin fecha de creación legible no se anota.
+ */
+function tc_abandoned_due( array $order, int $now, int $min_age = TC_ABANDONED_MIN_AGE ): bool {
+	$created = $order['created'] ?? null;
+	return is_int( $created ) && $created > 0 && $now - $created >= $min_age;
+}
+
+/** Texto de la nota de un pedido sin ningún intento de pago en Mercado Pago (el comprador no completó el pago). */
+function tc_abandoned_note_text(): string {
+	return 'Mercado Pago: no se registró ningún intento de pago para este pedido (el comprador no completó el pago o cerró la ventana). El pedido sigue pendiente; si paga después se actualiza solo y, si no, se cancela automáticamente.';
 }
 
 /** Texto de la nota de un pago rechazado: motivo en español para los códigos conocidos de Mercado Pago, o el código tal cual. */

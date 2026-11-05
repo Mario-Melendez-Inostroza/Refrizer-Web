@@ -75,6 +75,23 @@ function tc_note_rejected( array $deps, int $id, array $payments, string $refere
 }
 
 /**
+ * Deja UNA nota privada cuando el pedido pendiente lleva TC_ABANDONED_MIN_AGE segundos sin ningún intento de pago en Mercado Pago
+ * (dependencia opcional 'mark_abandoned'; sin ella no hace nada). Informativa: no cambia el estado. La marca se guarda ANTES de
+ * escribir la nota, así que ante un fallo se pierde la nota pero nunca se repite.
+ */
+function tc_note_abandoned( array $deps, int $id, array $order, int $now ): void {
+	if ( ! isset( $deps['mark_abandoned'] ) || ! empty( $order['abandoned_noted'] ) || ! tc_abandoned_due( $order, $now ) ) {
+		return;
+	}
+	try {
+		$deps['mark_abandoned']( $id, $now );
+		$deps['add_note']( $id, tc_abandoned_note_text() );
+	} catch ( \Throwable $e ) {
+		tc_log( $deps, sprintf( 'pedido #%d: no se pudo anotar el pedido sin pago (%s)', $id, tc_exception_summary( $e ) ) );
+	}
+}
+
+/**
  * Concilia un pedido. $deps: lock, unlock, read_order, search_payments, complete, mark_reconciled, add_note, alert, now
  * y, opcionales, log y mark_checked.
  * Con $dry_run no escribe nada: ni el pago, ni notas, ni correos (el resultado dice qué habría hecho).
@@ -124,6 +141,10 @@ function tc_run_reconcile( int $id, bool $dry_run, string $prefix, array $deps, 
 		// Sin pago aprobado pero con pagos rechazados de este pedido: se deja constancia en una nota (no cambia el estado).
 		if ( ! $dry_run && 'pending' === $decision['result'] && 'no_approved_payment' === ( $decision['reason'] ?? '' ) ) {
 			tc_note_rejected( $deps, $id, $payments, $prefix . $id, $order );
+		}
+		// Sin ningún pago en Mercado Pago tras un rato: nota única de "pago no completado" (no cambia el estado).
+		if ( ! $dry_run && 'pending' === $decision['result'] && 'no_payments_found' === ( $decision['reason'] ?? '' ) ) {
+			tc_note_abandoned( $deps, $id, $order, (int) $deps['now']() );
 		}
 		// Cerrado y sin pago aprobado (status_not_payable): se anota la hora para no reconsultarlo en cada pasada.
 		if ( $closed && ! $dry_run && 'skipped' === $decision['result'] && 'status_not_payable' === ( $decision['reason'] ?? '' ) ) {
@@ -284,6 +305,8 @@ function tc_wp_read_order( int $id ): ?array {
 		'alerted'        => (bool) $order->get_meta( '_tc_alerted', true ),
 		// Ids de pagos rechazados ya anotados en el pedido (separados por coma).
 		'rejected_noted' => (string) $order->get_meta( '_tc_rejected_noted', true ),
+		// ¿Ya se anotó que el pedido no tiene ningún intento de pago?
+		'abandoned_noted' => (bool) $order->get_meta( '_tc_abandoned_noted', true ),
 		// Timestamp del último chequeo sin pago aprobado de un pedido cerrado (0 si nunca).
 		'closed_checked' => (int) $order->get_meta( '_tc_closed_checked', true ),
 	);
@@ -385,6 +408,9 @@ function tc_wp_deps(): array {
 		'alert'           => 'tc_wp_alert',
 		'now'             => 'time',
 		'log'             => 'tc_wp_log',
+		'mark_abandoned'  => function ( int $id, int $now ): void {
+			tc_wp_set_meta( $id, '_tc_abandoned_noted', (string) $now );
+		},
 		'mark_rejected'   => function ( int $id, string $ids ): void {
 			tc_wp_set_meta( $id, '_tc_rejected_noted', $ids );
 		},

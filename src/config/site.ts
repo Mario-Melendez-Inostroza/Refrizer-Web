@@ -1,4 +1,4 @@
-import logoUrl from '@/assets/logo.jpg'
+import logoUrl from '@/assets/logo.webp'
 
 export const site = {
   name: 'Refrizer',

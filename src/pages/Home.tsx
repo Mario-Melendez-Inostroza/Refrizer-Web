@@ -104,7 +104,7 @@ function Featured() {
         </div>
 
         {!loading && (!data || data.length === 0) ? (
-          <p className="mt-10 rounded-2xl border border-dashed border-line bg-white p-10 text-center text-muted">Pronto nuevos productos.</p>
+          <p className="mt-10 grid min-h-[20rem] place-items-center rounded-2xl border border-dashed border-line bg-white p-10 text-center text-muted">Pronto nuevos productos.</p>
         ) : (
           <div className="relative mt-8">
             <button onClick={() => scroll(-1)} aria-label="Anterior" className="absolute -left-3 top-1/2 z-10 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-white text-ink shadow-md hover:text-brand md:grid lg:-left-6"><ChevronLeft className="size-5" /></button>

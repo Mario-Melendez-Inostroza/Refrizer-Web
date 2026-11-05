@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 import { site } from '@/config/site'
 
 /**
- * Logo de marca (src/assets/logo.jpg vía site.logo).
+ * Logo de marca (src/assets/logo.webp vía site.logo; el original de 1536 px está en reference/).
  * - horizontal (header): emblema recortado del logo circular con CSS + wordmark en texto real.
  * - circular (footer): el archivo completo.
  */

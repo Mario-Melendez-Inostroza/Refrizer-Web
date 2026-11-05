@@ -33,6 +33,10 @@
   <FilesMatch "^index\.html$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
+  # Imagenes y archivos estaticos de /images y de la raiz (favicon, og-image): 30 dias. La regla de /assets de abajo (un ano) gana en esos archivos.
+  <FilesMatch "[.](webp|jpe?g|png|ico|svg)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
   # /assets/*: el nombre cambia con el contenido, se pueden guardar un año.
   Header set Cache-Control "public, max-age=31536000, immutable" env=TIENDA_ASSET
 

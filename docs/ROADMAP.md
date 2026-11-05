@@ -52,12 +52,16 @@
 
 > **Estado 2026-11-04 (probado en producción con la cuenta de M, "Tienda Prueba_56", NO la de la clienta):** compra real de $10 con tarjeta: **débito aprobado** (pedido #23), **crédito aprobado** (#26) y **rechazado** (#25). Retorno correcto en los tres casos; el rechazo mostraba "pendiente" y se corrigió (`e1e392f`). Devolución: no se probó (decisión de M). El plugin deja una **nota privada "Mercado Pago: pago … rechazado (motivo)"** en el pedido rechazado (`b848e89`; probado en el #25 con `TC_DRY_RUN=false`; no repetir la nota: probado solo con pruebas unitarias, 122 pasan). **Queda pendiente repetir R1 y una compra mínima con las 4 credenciales de la aplicación de la clienta.** Hoy `config.php` y el plugin apuntan a la cuenta de M y `TC_DRY_RUN=false`.
 
-- [ ] **R1** (M) Access Token de **producción** de la clienta en el plugin y en `config.php`; `TC_MP_SELLER_ID` nuevo; `TC_DRY_RUN=true`; `vendedor=match`. **Cambiar a Opus 5.5**
-- [ ] **R2** (M) **Una compra real de monto mínimo** con una cuenta o tarjeta distinta de la vendedora; verificar retorno, stock, correos y que el cron lee el pago real
-- [ ] **R3** (M) **Devolver ese pago** desde el panel de Mercado Pago (avisar a la clienta que la comisión podría no reintegrarse)
-- [ ] **R4** (M+C) `TC_DRY_RUN=false`
+- [x] **R1** (M, 2026-11-05) Plugin vinculado a la cuenta **de la clienta** (aplicación creada por el plugin, "Modo Ventas (Producción)", credenciales `APP_` y `TEST`); `config.php` actualizado (0600, 10:23) y el cron lo lee con `vendedor=match` (13:25 UTC). Verificado por C sin ver los valores
+- [~] **R2** (M+Cliente, 2026-11-05) Compra real de $10 con la cuenta de la clienta: **pedido #29 pagado**, el dinero figura recibido en su Mercado Pago y al comprador le llegó el correo. **El aviso (IPN) no llegó** y el cron lo marcó pagado 39 min después (ver W1). **Falta:** pago **rechazado** con su cuenta (CVV mal puesto) y revisar la nota en el pedido
+- [-] **R3** (M) Devolución del pago: **decisión de M de no hacerla** (2026-11-04). Queda como no probada
+- [x] **R4** (M+C, 2026-11-05) `TC_DRY_RUN=false` a las 11:08 (hora de Chile); el cron de las 11:10 marcó el #29 `marked_paid` con la cuenta de la clienta: "Procesando", stock 7→6 una vez, correos "Nuevo pedido" y "Procesando tu pedido", nota "Conciliado por la función propia". Nuevo en el plugin: notas "pago rechazado (motivo)" y "no se registró ningún intento de pago" (el #28, que cerró la ventana de pago, la recibió a los 15 min)
 - [ ] **R5** (M) Borrar productos y pedidos de prueba; debug del plugin apagado; rastreo a 5 min
 - [ ] **R6** (M+Cliente) Decidir qué hacer con la tienda de WordPress pública en `/wp/` (redirigir sin tocar `wp-json`, `wc-api`, `wp-admin` ni `wp-login.php`)
+- [ ] **W1** (M+Cliente) **Por qué no llegó el aviso (IPN) del #29:** en `mercadopago.cl/developers` > Tus integraciones > aplicación `WooCommerce-598542ca…` > Webhooks/Notificaciones, ver qué URL hay y si hay envíos con error. La dirección `https://refrizer.cl/wp/wc-api/WC_WooMercadoPago_Basic_Gateway/` responde 400 desde fuera (el servidor no la bloquea). Mientras tanto el cron cubre el hueco en 5 a 10 min
+- [ ] **L1** (C, **el día de abrir**) Quitar la indexación bloqueada: `<meta name="robots" content="noindex, nofollow">` de `index.html`, `Disallow: /` de `public/robots.txt` (dejar `Allow: /` y el sitemap si se crea) y `robots.index:false` de `.figma/make/site.json`; build, subir con copia previa y comprobar con `curl` que ya no hay `noindex`. Hoy el sitio **no aparece en Google** a propósito
+- [ ] **L2** (Cliente+M) Dirección real y datos finales de contacto (hoy dice "Santiago, Chile")
+- [ ] **L3** (M+Cliente) Cargar los productos reales (K3), luego **R5**: borrar los 2 productos de prueba y los pedidos de prueba (WooCommerce los manda a la papelera; el vaciado definitivo lo hace M)
 
 ## 6. Entrega
 

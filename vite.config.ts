@@ -24,18 +24,23 @@ function siteUrl(mode: string): Plugin {
 /**
  * SEO del build:
  * - %ROBOTS_META%: sin SITE_INDEXABLE=1 deja <meta robots noindex,nofollow> (demo); con SITE_INDEXABLE=1 no pone nada (abierto a Google).
+ * - %GOOGLE_VERIFICATION%: con GOOGLE_SITE_VERIFICATION=<código> agrega <meta name="google-site-verification"> (Search Console); sin la variable, nada.
  * - %ORGANIZATION_JSONLD%: datos estructurados de la organización.
  * - Emite robots.txt (bloqueado o abierto según lo mismo) y sitemap-paginas.json (rutas fijas, que lee sitemap.php en el servidor).
  */
 function seoBuild(): Plugin {
   const indexable = process.env.SITE_INDEXABLE === '1'
   const origin = (process.env.SITE_URL || SEO_ORIGIN).replace(/\/$/, '')
+  // Solo letras, números, guion y guion bajo: el código de Search Console no lleva nada más.
+  const code = (process.env.GOOGLE_SITE_VERIFICATION || '').trim()
+  const verification = /^[A-Za-z0-9_-]{20,100}$/.test(code) ? `<meta name="google-site-verification" content="${code}" />` : ''
   const ld = JSON.stringify(organizationJsonLd({ origin, ...organization })).split(String.fromCharCode(60)).join(String.fromCharCode(92) + 'u003c') // '<' -> <
   return {
     name: 'seo-build',
     transformIndexHtml: (html) =>
       html
         .replace('%ROBOTS_META%', indexable ? '' : '<meta name="robots" content="noindex, nofollow" />')
+        .replace('%GOOGLE_VERIFICATION%', verification)
         .replace('%ORGANIZATION_JSONLD%', ld),
     generateBundle() {
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(indexable, origin) })

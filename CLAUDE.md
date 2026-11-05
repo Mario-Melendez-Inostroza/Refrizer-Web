@@ -19,6 +19,7 @@ Este proyecto **ya tiene diseño propio** y es la tienda real de una clienta. El
 | `frontend-y-despliegue` | `site.ts`, build, subir o reemplazar archivos |
 | `pruebas-de-pago` | compras de prueba, rechazos, qué falta probar |
 | `correos-tienda` | remitente, SPF/DKIM/DMARC |
+| `seo-tienda` | aparecer en Google: SEO técnico, contenido, sitemap, Search Console, abrir a buscadores |
 | `cpanel-y-chrome` | operar cPanel/WordPress con Chrome (incluye snippets listos) |
 
 Si una skill no aparece en tu lista, léela directamente en `.claude/skills/<nombre>/SKILL.md` (son archivos normales).

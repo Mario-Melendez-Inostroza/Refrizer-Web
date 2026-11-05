@@ -12,8 +12,10 @@ export const site = {
     message: 'Hola Refrizer, quiero hacer una consulta.',
   },
   email: 'ventas@refrizer.cl',
-  address: 'Santiago, Chile',
-  city: 'Santiago, Chile',
+  // Sin tienda física: se despacha a Santiago y regiones o se retira en la comuna de Peñaflor.
+  address: 'Retiro en Peñaflor, Región Metropolitana',
+  city: 'Peñaflor, Región Metropolitana',
+  pickup: { commune: 'Peñaflor', region: 'Región Metropolitana' },
   hours: 'Lun - Vie 09:00 a 18:00 | Sáb 09:00 a 13:00',
   hero: {
     eyebrow: 'Soluciones que enfrían y conectan',
@@ -21,7 +23,7 @@ export const site = {
     titleHighlight: 'tu hogar o negocio',
     subtitle: 'Venta de productos, instalación y mantención con la mejor calidad y asesoría especializada.',
     trust: [
-      { icon: 'delivery', title: 'Entrega', subtitle: 'coordinada' },
+      { icon: 'delivery', title: 'Despacho', subtitle: 'o retiro' },
       { icon: 'shield', title: 'Productos', subtitle: 'de calidad' },
       { icon: 'headset', title: 'Asesoría', subtitle: 'en tu compra' },
     ],
@@ -41,7 +43,7 @@ export const site = {
     ],
   },
   benefits: [
-    { icon: 'delivery', title: 'Entrega coordinada', text: 'Coordinamos la entrega contigo' },
+    { icon: 'delivery', title: 'Despacho o retiro', text: 'Santiago, regiones o Peñaflor' },
     { icon: 'shield', title: 'Productos originales', text: 'y con garantía' },
     { icon: 'card', title: 'Pago seguro', text: 'con Mercado Pago' },
     { icon: 'headset', title: 'Asesoría personalizada', text: 'en todo momento' },
@@ -73,8 +75,8 @@ export const site = {
   paymentMethods: ['Mercado Pago'],
   shipping: { enabled: false },
   delivery: {
-    text: 'Coordinamos la entrega contigo',
-    detail: 'Una vez confirmado tu pago te contactaremos para acordar la entrega o retiro.',
+    text: 'Despacho a Santiago y regiones, o retiro en Peñaflor',
+    detail: 'Una vez confirmado tu pago te contactaremos para coordinar el despacho o el retiro.',
   },
   flags: {
     showFeatured: true,

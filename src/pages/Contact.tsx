@@ -16,7 +16,7 @@ export default function Contact() {
     setSent(true)
   }
   const info = [
-    { icon: MapPin, label: 'Dirección', value: site.address },
+    { icon: MapPin, label: 'Retiro y despacho', value: `${site.address}. Despacho a Santiago y regiones.` },
     { icon: Phone, label: 'Teléfono', value: site.phone, href: `tel:${site.phone.replace(/\s/g, '')}` },
     { icon: Mail, label: 'Correo', value: site.email, href: `mailto:${site.email}` },
     { icon: Clock, label: 'Horario', value: site.hours },

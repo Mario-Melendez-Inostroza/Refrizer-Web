@@ -10,7 +10,7 @@ import type { OrderStatus } from '@/types'
 import { usePageTitle } from '@/lib/usePageTitle'
 
 const STATES = {
-  paid: { icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50', title: '¡Pago recibido!', text: `Gracias por tu compra. ${site.delivery.text}: te escribiremos pronto con los detalles.` },
+  paid: { icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50', title: '¡Pago recibido!', text: 'Gracias por tu compra. Te escribiremos pronto para coordinar el despacho o el retiro.' },
   pending: { icon: Clock, color: 'text-amber-600 bg-amber-50', title: 'Pago pendiente de confirmación', text: 'Mercado Pago aún no confirma tu pago. Puede tardar un par de minutos; no cierres esta página.' },
   failed: { icon: XCircle, color: 'text-red-600 bg-red-50', title: 'No pudimos procesar el pago', text: 'No se realizó ningún cargo. Tu carrito sigue guardado para que lo intentes nuevamente.' },
 }

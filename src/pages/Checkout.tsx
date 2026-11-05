@@ -9,8 +9,8 @@ import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
 import { usePageTitle } from '@/lib/usePageTitle'
 
-type Form = { nombre: string; rut: string; email: string; telefono: string; region: string; comuna: string; direccion: string; notas: string }
-const empty: Form = { nombre: '', rut: '', email: '', telefono: '', region: '', comuna: '', direccion: '', notas: '' }
+type Form = { nombre: string; rut: string; email: string; telefono: string; region: string; comuna: string; direccion: string; notas: string; entrega: 'despacho' | 'retiro' }
+const empty: Form = { nombre: '', rut: '', email: '', telefono: '', region: '', comuna: '', direccion: '', notas: '', entrega: 'despacho' }
 
 function validate(f: Form) {
   const e: Partial<Record<keyof Form, string>> = {}
@@ -18,9 +18,12 @@ function validate(f: Form) {
   if (!isValidRut(f.rut)) e.rut = 'RUT inválido'
   if (!/^\S+@\S+\.\S+$/.test(f.email)) e.email = 'Correo inválido'
   if (f.telefono.replace(/\D/g, '').length < 8) e.telefono = 'Teléfono inválido'
-  if (!f.region) e.region = 'Selecciona una región'
-  if (!f.comuna) e.comuna = 'Selecciona una comuna'
-  if (!f.direccion.trim()) e.direccion = 'Ingresa tu dirección'
+  // Con retiro en Peñaflor no se pide dirección.
+  if (f.entrega === 'despacho') {
+    if (!f.region) e.region = 'Selecciona una región'
+    if (!f.comuna) e.comuna = 'Selecciona una comuna'
+    if (!f.direccion.trim()) e.direccion = 'Ingresa tu dirección'
+  }
   return e
 }
 
@@ -47,10 +50,15 @@ export default function Checkout() {
     try {
       // WooCommerce pide nombre y apellido por separado: la primera palabra es el nombre y el resto el apellido.
       const [firstName, ...rest] = form.nombre.trim().split(/\s+/)
+      const retiro = form.entrega === 'retiro'
+      const shipping = retiro
+        ? { region: site.pickup.region, commune: site.pickup.commune, address: `Retiro en ${site.pickup.commune} (sin despacho)` }
+        : { region: form.region, commune: form.comuna, address: form.direccion.trim() }
+      const entregaNota = retiro ? `Entrega: retiro en ${site.pickup.commune}` : 'Entrega: despacho a coordinar'
       const { redirectUrl } = await createCheckout({
         customer: { firstName, lastName: rest.join(' '), email: form.email.trim(), phone: form.telefono.trim(), rut: form.rut },
-        shipping: { region: form.region, commune: form.comuna, address: form.direccion.trim() },
-        notes: form.notas,
+        shipping,
+        notes: [entregaNota, form.notas.trim()].filter(Boolean).join('\n'),
         expectedTotal: subtotal,
         items: items.map((i) => ({ productId: i.product.id, quantity: i.quantity })),
       })
@@ -86,12 +94,24 @@ export default function Checkout() {
         <form onSubmit={submit} noValidate className="container-x grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="rounded-2xl border border-line bg-white p-6 sm:p-8">
             <h2 className="text-lg font-semibold text-navy-900">Datos de contacto y entrega</h2>
-            <p className="mt-1 text-sm text-muted">Usaremos tu dirección solo para coordinar la entrega contigo. No se cobra envío por la página.</p>
+            <p className="mt-1 text-sm text-muted">Usaremos tus datos solo para coordinar la entrega contigo. No se cobra envío por la página.</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">{field('nombre', 'Nombre completo', { autoComplete: 'name' })}</div>
               {field('rut', 'RUT', { placeholder: '12.345.678-9', inputMode: 'text' })}
               {field('telefono', 'Teléfono', { type: 'tel', placeholder: '+56 9 1234 5678', autoComplete: 'tel' })}
               <div className="sm:col-span-2">{field('email', 'Correo electrónico', { type: 'email', autoComplete: 'email' })}</div>
+              <fieldset className="sm:col-span-2">
+                <legend className="label">¿Cómo quieres recibir tu compra?</legend>
+                <div className="mt-1 grid gap-3 sm:grid-cols-2">
+                  {([['despacho', 'Despacho a Santiago y regiones', 'Coordinamos el despacho contigo después del pago.'], ['retiro', `Retiro en ${site.pickup.commune}`, 'Sin dirección: te contactamos para coordinar el retiro.']] as const).map(([v, t, d]) => (
+                    <label key={v} className={`flex cursor-pointer gap-3 rounded-xl border p-4 text-sm ${form.entrega === v ? 'border-brand bg-surface' : 'border-line'}`}>
+                      <input type="radio" name="entrega" value={v} checked={form.entrega === v} onChange={() => set('entrega', v)} className="mt-1" />
+                      <span><strong className="block text-ink">{t}</strong><span className="text-muted">{d}</span></span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              {form.entrega === 'despacho' && (<>
               <div>
                 <label htmlFor="region" className="label">Región</label>
                 <select id="region" value={form.region} onChange={(e) => set('region', e.target.value)} aria-invalid={!!errors.region} className={`input ${errors.region ? 'border-red-500' : ''}`}>
@@ -109,6 +129,7 @@ export default function Checkout() {
                 {errors.comuna && <p className="mt-1 text-xs text-red-600">{errors.comuna}</p>}
               </div>
               <div className="sm:col-span-2">{field('direccion', 'Dirección', { placeholder: 'Calle, número, depto.', autoComplete: 'street-address' })}</div>
+              </>)}
               <div className="sm:col-span-2">
                 <label htmlFor="notas" className="label">Notas del pedido <span className="font-normal text-muted">(opcional)</span></label>
                 <textarea id="notas" rows={3} value={form.notas} onChange={(e) => set('notas', e.target.value)} className="input" placeholder="Indicaciones adicionales" />

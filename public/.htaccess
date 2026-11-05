@@ -6,6 +6,9 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+  # Un solo dominio: www.refrizer.cl redirige (301) a refrizer.cl, para no duplicar el sitio en Google.
+  RewriteCond %{HTTP_HOST} ^www[.]refrizer[.]cl$ [NC]
+  RewriteRule ^ https://refrizer.cl%{REQUEST_URI} [R=301,L]
 
   # WordPress (/wp, /wp/wp-json para la Store API y la conciliación, /wp/wc-api para el aviso de Mercado Pago)
   # nunca pasa por la SPA.

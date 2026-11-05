@@ -1,0 +1,26 @@
+# Redirige la tienda pública de WordPress (el tema, en /wp/) a la portada de React, sin tocar lo que la tienda necesita.
+# Pegar AL PRINCIPIO de /home/USUARIO/<carpeta-del-sitio>/wp/.htaccess (antes de "# BEGIN WordPress"), con copia previa.
+# Cambiar "dominio.cl" por el dominio de la clienta. Probado en BenzaHosting (Refrizer, 2026-11-05).
+#
+# NO se redirige: wp-admin, wp-login.php, wp-json (Store API y conciliación), wc-api (aviso de pago de Mercado Pago, por ruta y por
+# ?wc-api=), wp-content, wp-includes, wp-cron.php, xmlrpc.php, .well-known, ?wc-ajax, ?rest_route ni a quien tiene sesión de
+# administrador (para poder ver la tienda de WordPress).
+#
+# LECCIÓN: la condición mira THE_REQUEST (la petición original) y NO REQUEST_URI. Las rutas virtuales de WordPress (como
+# /wp/wc-api/...) se reinician internamente como /wp/index.php y, con REQUEST_URI, la regla redirigía el aviso de pago.
+# Sin las comillas ni barras invertidas a propósito: se pega tal cual.
+#
+# Verificar después, UNA petición cada 1,5 s (Imunify360): /wp/ y /wp/producto/x/ redirigen a la portada; /wp/wp-login.php,
+# /wp/wp-json/wc/store/v1/products, /wp/wc-api/WC_WooMercadoPago_Basic_Gateway/ (400, no redirigido), /wp/?wc-api=WC_WooMercadoPago_Basic_Gateway
+# (400), /wp/wp-includes/js/jquery/jquery.min.js y /wp/wp-cron.php responden como antes; POST /wp/wp-json/tienda/v1/reconcile {} da not_found.
+# Si algo falla: restaurar la copia del .htaccess de inmediato.
+
+# BEGIN TC-REDIRECT-PORTADA
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{THE_REQUEST} !^[A-Z]+[[:space:]]+/wp/(wp-admin|wp-login.php|wp-json|wp-content|wp-includes|wp-cron.php|xmlrpc.php|wc-api|.well-known)([/?[:space:]])
+RewriteCond %{QUERY_STRING} !(^|&)(wc-api|wc-ajax|rest_route|doing_wp_cron)=
+RewriteCond %{HTTP_COOKIE} !wordpress_logged_in_
+RewriteRule ^ https://dominio.cl/ [R=302,L]
+</IfModule>
+# END TC-REDIRECT-PORTADA

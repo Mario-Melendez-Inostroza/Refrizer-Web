@@ -14,7 +14,8 @@ export const site = {
   email: 'ventas@refrizer.cl',
   // Sin tienda física: se despacha a Santiago y regiones o se retira en la comuna de Peñaflor.
   address: 'Retiro en Peñaflor, Región Metropolitana',
-  city: 'Peñaflor, Región Metropolitana',
+  // Los servicios técnicos se hacen en todo Santiago; Peñaflor es solo el punto de retiro de productos.
+  city: 'Servicios en todo Santiago · Retiro en Peñaflor',
   pickup: { commune: 'Peñaflor', region: 'Región Metropolitana' },
   hours: 'Lun - Vie 09:00 a 18:00 | Sáb 09:00 a 13:00',
   hero: {

@@ -16,7 +16,7 @@ export default function Contact() {
     setSent(true)
   }
   const info = [
-    { icon: MapPin, label: 'Retiro y despacho', value: `${site.address}. Despacho a Santiago y regiones.` },
+    { icon: MapPin, label: 'Cobertura', value: `Servicios técnicos en todo Santiago. Productos con despacho a Santiago y regiones o retiro en ${site.pickup.commune}.` },
     { icon: Phone, label: 'Teléfono', value: site.phone, href: `tel:${site.phone.replace(/\s/g, '')}` },
     { icon: Mail, label: 'Correo', value: site.email, href: `mailto:${site.email}` },
     { icon: Clock, label: 'Horario', value: site.hours },

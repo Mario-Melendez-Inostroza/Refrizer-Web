@@ -4,8 +4,10 @@ import { site } from '@/config/site'
 import { whatsappUrl } from '@/lib/format'
 import PageHeader from '@/components/PageHeader'
 import { WhatsappIcon } from '@/components/SocialIcons'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export default function Contact() {
+  usePageTitle('Contacto')
   const [sent, setSent] = useState(false)
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

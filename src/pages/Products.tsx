@@ -6,8 +6,10 @@ import { getCategories, getProducts } from '@/services'
 import { useAsync } from '@/lib/useAsync'
 import PageHeader from '@/components/PageHeader'
 import ProductCard from '@/components/ProductCard'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export default function Products() {
+  usePageTitle('Productos')
   const [params, setParams] = useSearchParams()
   const category = params.get('categoria') ?? ''
   const q = params.get('q') ?? ''

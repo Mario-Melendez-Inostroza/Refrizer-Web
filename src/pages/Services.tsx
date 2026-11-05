@@ -3,8 +3,10 @@ import { whatsappUrl } from '@/lib/format'
 import Icon from '@/components/Icon'
 import PageHeader from '@/components/PageHeader'
 import { Benefits } from './Home'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export default function Services() {
+  usePageTitle('Servicios')
   const s = site.services
   return (
     <>

@@ -6,10 +6,12 @@ import { useAsync } from '@/lib/useAsync'
 import { formatCLP } from '@/lib/format'
 import { useCart } from '@/lib/cart'
 import { site } from '@/config/site'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export default function ProductDetail() {
   const { slug = '' } = useParams()
   const { data: product, loading } = useAsync(() => getProduct(slug), [slug])
+  usePageTitle(product?.name)
   const [active, setActive] = useState(0)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)

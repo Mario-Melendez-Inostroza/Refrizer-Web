@@ -7,6 +7,7 @@ import { whatsappUrl } from '@/lib/format'
 import { returnedRejected, returnedWithoutPayment } from '@/lib/return'
 import { getOrderStatus, hasOrderAccess, lastOrderId, orderIdFromReference, reconcileSaysPaid, requestReconcile } from '@/services/orders'
 import type { OrderStatus } from '@/types'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 const STATES = {
   paid: { icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50', title: '¡Pago recibido!', text: `Gracias por tu compra. ${site.delivery.text}: te escribiremos pronto con los detalles.` },
@@ -23,6 +24,7 @@ const REJECTED = { title: 'Tu pago fue rechazado', text: 'No se realizó ningún
 const NO_PAYMENT = { title: 'Todavía no registramos tu pago.', text: 'Si ya pagaste, espera unos minutos y pulsa "Actualizar estado". Si no, puedes intentarlo nuevamente.' }
 
 export default function PaymentReturn() {
+  usePageTitle('Estado de tu pedido')
   const [query] = useSearchParams()
   // Mercado Pago vuelve a una URL fija con external_reference = prefijo + id del pedido. Si falta o no cuadra, se usa
   // el último pedido creado en este navegador. status, payment_id y collection_status los controla el comprador: solo

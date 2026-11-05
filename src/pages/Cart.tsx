@@ -4,8 +4,10 @@ import { useCart } from '@/lib/cart'
 import { formatCLP, priceOf } from '@/lib/format'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export default function Cart() {
+  usePageTitle('Carrito')
   const { items, subtotal, loading, update, remove } = useCart()
   if (loading) return <div className="container-x py-24 text-center text-muted" role="status">Cargando tu carrito…</div>
   return (

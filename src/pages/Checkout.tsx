@@ -7,6 +7,7 @@ import { REGIONES, formatRut, isValidRut } from '@/lib/chile'
 import { createCheckout } from '@/services'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 type Form = { nombre: string; rut: string; email: string; telefono: string; region: string; comuna: string; direccion: string; notas: string }
 const empty: Form = { nombre: '', rut: '', email: '', telefono: '', region: '', comuna: '', direccion: '', notas: '' }
@@ -24,6 +25,7 @@ function validate(f: Form) {
 }
 
 export default function Checkout() {
+  usePageTitle('Finalizar compra')
   const { items, subtotal, loading } = useCart()
   const [form, setForm] = useState<Form>(empty)
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({})
@@ -83,7 +85,8 @@ export default function Checkout() {
       <section className="bg-surface py-10">
         <form onSubmit={submit} noValidate className="container-x grid gap-6 lg:grid-cols-[1fr_380px]">
           <div className="rounded-2xl border border-line bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-navy-900">Datos del cliente</h2>
+            <h2 className="text-lg font-semibold text-navy-900">Datos de contacto y entrega</h2>
+            <p className="mt-1 text-sm text-muted">Usaremos tu dirección solo para coordinar la entrega contigo. No se cobra envío por la página.</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">{field('nombre', 'Nombre completo', { autoComplete: 'name' })}</div>
               {field('rut', 'RUT', { placeholder: '12.345.678-9', inputMode: 'text' })}

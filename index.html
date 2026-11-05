@@ -3,32 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Refrizer – Refrigeración & Electricidad</title>
-    <meta name="description" content="Venta de productos, instalación y mantención en refrigeración y electricidad para tu hogar o negocio." />
+    <title>Refrizer | Refrigeración y electricidad en Santiago</title>
+    <meta name="description" content="Venta de productos, instalación y mantención de aire acondicionado, refrigeración y electricidad en todo Santiago. Despacho a regiones y pago con Mercado Pago." />
+    <link rel="canonical" href="%SITE_URL%/" />
 
-    <!-- DEMO: no indexar. Al publicar el dominio definitivo, quita esta línea, el
-         header X-Robots-Tag de vercel.json y `Disallow: /` de public/robots.txt (ver README). -->
-    <meta name="robots" content="noindex, nofollow" />
+    <!-- Indexación: la etiqueta robots la decide el build. `npm run build:hosting` = bloqueado (demo, hasta abrir la tienda);
+         `SITE_INDEXABLE=1 npm run build:hosting` = abierto a Google (sin etiqueta) y con robots.txt y sitemap activos. -->
+    %ROBOTS_META%
 
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#0b2557" />
 
-    <!-- Al compartir el enlace. %SITE_URL% lo completa vite.config.ts (SITE_URL o el dominio de Vercel). -->
+    <!-- Al compartir el enlace. %SITE_URL% lo completa vite.config.ts (SITE_URL o el dominio de producción). -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
     <meta property="og:site_name" content="Refrizer" />
-    <meta property="og:title" content="Refrizer – Refrigeración & Electricidad" />
-    <meta property="og:description" content="Venta de productos, instalación y mantención en refrigeración y electricidad para tu hogar o negocio." />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:title" content="Refrizer | Refrigeración y electricidad en Santiago" />
+    <meta property="og:description" content="Venta de productos, instalación y mantención de aire acondicionado, refrigeración y electricidad en todo Santiago. Despacho a regiones y pago con Mercado Pago." />
     <meta property="og:image" content="%SITE_URL%/og-image.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Refrizer | Refrigeración y electricidad en Santiago" />
+    <meta name="twitter:description" content="Venta de productos, instalación y mantención de aire acondicionado, refrigeración y electricidad en todo Santiago. Despacho a regiones y pago con Mercado Pago." />
     <meta name="twitter:image" content="%SITE_URL%/og-image.jpg" />
+
+    <!-- Datos estructurados de la organización (sin dirección: no hay local; los servicios son en todo Santiago). -->
+    <script type="application/ld+json">%ORGANIZATION_JSONLD%</script>
   </head>
   <body>
     <div id="root"></div>
+    <!-- Contenido mínimo para quien no ejecuta JavaScript (algunos rastreadores y lectores). -->
+    <noscript>
+      <h1>Refrizer: refrigeración y electricidad en Santiago</h1>
+      <p>Venta de productos, instalación, mantención y reparación de aire acondicionado y refrigeradores, e instalaciones eléctricas en todas las comunas de Santiago. Despacho de productos a Santiago y regiones, o retiro en Peñaflor. Pago con Mercado Pago.</p>
+      <ul>
+        <li><a href="/productos">Productos</a></li>
+        <li><a href="/servicios">Servicios técnicos en Santiago</a></li>
+        <li><a href="/cobertura">Cobertura</a></li>
+        <li><a href="/despacho-y-retiro">Despacho y retiro</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+      </ul>
+      <p>Esta tienda necesita JavaScript para funcionar.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

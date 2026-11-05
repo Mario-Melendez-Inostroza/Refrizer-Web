@@ -2,10 +2,11 @@ import { CheckCircle2 } from 'lucide-react'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
 import ClientsMarquee from '@/components/ClientsMarquee'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { seoPages } from '@/config/seo'
 
 export default function About() {
-  usePageTitle('Nosotros')
+  useSeo(seoPages.about)
   const a = site.about
   return (
     <>

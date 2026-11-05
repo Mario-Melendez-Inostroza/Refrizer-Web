@@ -1,8 +1,9 @@
 import { Link } from 'react-router'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { seoPrivate } from '@/config/seo'
 
 export default function NotFound() {
-  usePageTitle('Página no encontrada')
+  useSeo(seoPrivate.notFound)
   return (
     <div className="container-x py-24 text-center">
       <p className="eyebrow">Error 404</p>

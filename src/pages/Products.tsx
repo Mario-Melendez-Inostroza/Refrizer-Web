@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 import { PackageSearch, Search } from 'lucide-react'
 import type { ProductSort } from '@/types'
 import { getCategories, getProducts } from '@/services'
 import { useAsync } from '@/lib/useAsync'
 import PageHeader from '@/components/PageHeader'
 import ProductCard from '@/components/ProductCard'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { SEO_ORIGIN, seoPages } from '@/config/seo'
+import { breadcrumbJsonLd } from '@/lib/seo'
 
 export default function Products() {
-  usePageTitle('Productos')
+  const { slug } = useParams()
   const [params, setParams] = useSearchParams()
-  const category = params.get('categoria') ?? ''
+  // La categoría tiene URL propia (/categoria/aire-acondicionado); ?categoria= sigue funcionando por enlaces antiguos.
+  const category = slug ?? params.get('categoria') ?? ''
   const q = params.get('q') ?? ''
   const sort = (params.get('orden') as ProductSort) || 'default'
   const [term, setTerm] = useState(q)
@@ -20,6 +23,21 @@ export default function Products() {
   }, [q])
 
   const { data: categories } = useAsync(getCategories, [])
+  const catName = categories?.find((c) => c.slug === category)?.name
+  useSeo(
+    q
+      ? { ...seoPages.products, noindex: true } // resultados de búsqueda interna: no se indexan
+      : category && catName
+        ? {
+            path: `/categoria/${category}`,
+            title: catName,
+            description: `${catName}: despacho a Santiago y regiones o retiro en Peñaflor. Pago seguro con Mercado Pago.`,
+            jsonLd: [breadcrumbJsonLd(SEO_ORIGIN, [{ name: 'Inicio', path: '/' }, { name: 'Productos', path: '/productos' }, { name: catName, path: `/categoria/${category}` }])],
+          }
+        : category
+          ? null // categoría aún cargando o inexistente
+          : { ...seoPages.products, jsonLd: [breadcrumbJsonLd(SEO_ORIGIN, [{ name: 'Inicio', path: '/' }, { name: 'Productos', path: '/productos' }])] },
+  )
   const { data: products, loading } = useAsync(() => getProducts({ category, search: q, sort }), [category, q, sort])
 
   const set = (key: string, value: string) => {
@@ -53,9 +71,9 @@ export default function Products() {
             </div>
           </div>
           <div role="group" aria-label="Filtrar por categoría" className="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-            <button className={chip(!category)} aria-pressed={!category} onClick={() => set('categoria', '')}>Todas</button>
+            <Link to="/productos" className={chip(!category)} aria-current={!category ? 'page' : undefined}>Todas</Link>
             {categories?.map((c) => (
-              <button key={c.id} className={chip(category === c.slug)} aria-pressed={category === c.slug} onClick={() => set('categoria', c.slug)}>{c.name}</button>
+              <Link key={c.id} to={`/categoria/${c.slug}`} className={chip(category === c.slug)} aria-current={category === c.slug ? 'page' : undefined}>{c.name}</Link>
             ))}
           </div>
 

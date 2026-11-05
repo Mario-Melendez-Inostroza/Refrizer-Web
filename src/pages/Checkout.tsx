@@ -7,7 +7,8 @@ import { REGIONES, formatRut, isValidRut } from '@/lib/chile'
 import { createCheckout } from '@/services'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { seoPrivate } from '@/config/seo'
 
 type Form = { nombre: string; rut: string; email: string; telefono: string; region: string; comuna: string; direccion: string; notas: string; entrega: 'despacho' | 'retiro' }
 const empty: Form = { nombre: '', rut: '', email: '', telefono: '', region: '', comuna: '', direccion: '', notas: '', entrega: 'despacho' }
@@ -28,7 +29,7 @@ function validate(f: Form) {
 }
 
 export default function Checkout() {
-  usePageTitle('Finalizar compra')
+  useSeo(seoPrivate.checkout)
   const { items, subtotal, loading } = useCart()
   const [form, setForm] = useState<Form>(empty)
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({})

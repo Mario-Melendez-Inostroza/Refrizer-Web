@@ -2,6 +2,8 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
+import { organizationJsonLd, robotsTxt } from './src/lib/seo'
+import { SEO_ORIGIN, organization, staticPaths } from './src/config/seo'
 
 /**
  * Completa %SITE_URL% en index.html (Open Graph pide URLs absolutas).
@@ -16,6 +18,29 @@ function siteUrl(mode: string): Plugin {
   return {
     name: 'site-url',
     transformIndexHtml: (html) => html.replace(/%SITE_URL%/g, url),
+  }
+}
+
+/**
+ * SEO del build:
+ * - %ROBOTS_META%: sin SITE_INDEXABLE=1 deja <meta robots noindex,nofollow> (demo); con SITE_INDEXABLE=1 no pone nada (abierto a Google).
+ * - %ORGANIZATION_JSONLD%: datos estructurados de la organización.
+ * - Emite robots.txt (bloqueado o abierto según lo mismo) y sitemap-paginas.json (rutas fijas, que lee sitemap.php en el servidor).
+ */
+function seoBuild(): Plugin {
+  const indexable = process.env.SITE_INDEXABLE === '1'
+  const origin = (process.env.SITE_URL || SEO_ORIGIN).replace(/\/$/, '')
+  const ld = JSON.stringify(organizationJsonLd({ origin, ...organization })).split(String.fromCharCode(60)).join(String.fromCharCode(92) + 'u003c') // '<' -> <
+  return {
+    name: 'seo-build',
+    transformIndexHtml: (html) =>
+      html
+        .replace('%ROBOTS_META%', indexable ? '' : '<meta name="robots" content="noindex, nofollow" />')
+        .replace('%ORGANIZATION_JSONLD%', ld),
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(indexable, origin) })
+      this.emitFile({ type: 'asset', fileName: 'sitemap-paginas.json', source: JSON.stringify({ origin, paginas: staticPaths() }, null, 2) })
+    },
   }
 }
 
@@ -38,7 +63,7 @@ export default defineConfig(({ mode }) => {
   return {
     // `npm run build:hosting` (modo "hosting") publica en la raíz del dominio de BenzaHosting.
     base: '/',
-    plugins: [react(), tailwindcss(), siteUrl(mode)],
+    plugins: [react(), tailwindcss(), siteUrl(mode), seoBuild()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),

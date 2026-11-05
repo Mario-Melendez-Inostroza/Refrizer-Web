@@ -10,6 +10,8 @@
   # WordPress (/wp, /wp/wp-json para la Store API y la conciliación, /wp/wc-api para el aviso de Mercado Pago)
   # nunca pasa por la SPA.
   RewriteRule ^wp(/|$) - [L]
+  # Sitemap dinamico: /sitemap.xml lo genera sitemap.php (productos y categorias de WooCommerce).
+  RewriteRule ^sitemap[.]xml$ /sitemap.php [L]
 
   # Archivos con hash de Vite: se marcan para la caché larga (ver mod_headers abajo).
   RewriteRule ^assets/ - [E=TIENDA_ASSET:1]

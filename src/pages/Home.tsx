@@ -2,6 +2,9 @@ import { Link } from 'react-router'
 import { useRef } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, ShoppingCart, Snowflake } from 'lucide-react'
 import { site } from '@/config/site'
+import { useSeo } from '@/lib/useSeo'
+import { SEO_ORIGIN, SITE_NAME, seoPages } from '@/config/seo'
+import { websiteJsonLd } from '@/lib/seo'
 import { getCategories, getProducts } from '@/services'
 import { useAsync } from '@/lib/useAsync'
 import { placeholder } from '@/lib/placeholder'
@@ -67,7 +70,7 @@ function Categories() {
           {(data ?? Array.from({ length: 7 }, () => null)).map((c, i) => (
             <li key={c?.id ?? i}>
               {c ? (
-                <Link to={`/productos?categoria=${c.slug}`} className="flex h-full flex-col items-center rounded-xl border border-line bg-white px-3 pb-4 pt-3 shadow-[0_4px_14px_-8px_rgba(11,37,87,0.2)] text-center transition-colors hover:border-brand hover:bg-brand/[0.03]">
+                <Link to={`/categoria/${c.slug}`} className="flex h-full flex-col items-center rounded-xl border border-line bg-white px-3 pb-4 pt-3 shadow-[0_4px_14px_-8px_rgba(11,37,87,0.2)] text-center transition-colors hover:border-brand hover:bg-brand/[0.03]">
                   <img src={c.image?.src ?? placeholder()} alt="" className="aspect-[6/5] w-full rounded-lg object-cover" />
                   <span className="mt-3 text-[13px] font-semibold leading-tight text-ink">{c.name}</span>
                 </Link>
@@ -188,6 +191,7 @@ function About() {
 }
 
 export default function Home() {
+  useSeo({ ...seoPages.home, jsonLd: [websiteJsonLd(SEO_ORIGIN, SITE_NAME)] })
   return (
     <>
       <Hero />

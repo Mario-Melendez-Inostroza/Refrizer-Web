@@ -1,3 +1,0 @@
-# Demo: no indexar. Quitar al publicar el dominio definitivo (ver README).
-User-agent: *
-Disallow: /

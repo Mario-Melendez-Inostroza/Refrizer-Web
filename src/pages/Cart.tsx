@@ -4,10 +4,11 @@ import { useCart } from '@/lib/cart'
 import { formatCLP, priceOf } from '@/lib/format'
 import { site } from '@/config/site'
 import PageHeader from '@/components/PageHeader'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { seoPrivate } from '@/config/seo'
 
 export default function Cart() {
-  usePageTitle('Carrito')
+  useSeo(seoPrivate.cart)
   const { items, subtotal, loading, update, remove } = useCart()
   if (loading) return <div className="container-x py-24 text-center text-muted" role="status">Cargando tu carrito…</div>
   return (

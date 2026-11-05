@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import Header from './Header'
 import Footer from './Footer'
@@ -14,7 +14,9 @@ export default function Layout() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-2">Saltar al contenido</a>
       <Header />
       <main id="main" className="flex-1">
-        <Outlet />
+        <Suspense fallback={<div className="container-x py-24 text-center text-muted" role="status">Cargando…</div>}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
       <WhatsAppButton />

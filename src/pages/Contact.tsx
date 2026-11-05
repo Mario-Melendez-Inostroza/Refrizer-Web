@@ -4,10 +4,11 @@ import { site } from '@/config/site'
 import { whatsappUrl } from '@/lib/format'
 import PageHeader from '@/components/PageHeader'
 import { WhatsappIcon } from '@/components/SocialIcons'
-import { usePageTitle } from '@/lib/usePageTitle'
+import { useSeo } from '@/lib/useSeo'
+import { seoPages } from '@/config/seo'
 
 export default function Contact() {
-  usePageTitle('Contacto')
+  useSeo(seoPages.contact)
   const [sent, setSent] = useState(false)
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

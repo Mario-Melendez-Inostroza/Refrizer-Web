@@ -1,27 +1,33 @@
-# Refrizer Web
+# AGENTS.md — Refrizer
 
-Tienda web de Refrizer (refrigeración y electricidad). React + Vite + Tailwind CSS v4 + React Router.
+Guía de entrada para agentes de IA (Claude Code u otros) y para cualquier persona que abra este repositorio. Es corta a propósito: el detalle está en docs/ia/.
 
-## Desarrollo
+## Qué es
+Sitio web de Refrizer: venta, instalación y mantención en refrigeración y electricidad para hogar y negocio.
+Sitio en vivo: https://refrizer-web.vercel.app/
 
-- `npm run dev` levanta Vite en el puerto `PORT` (por defecto 8443).
-- `npm run build` genera `dist/`; `npm run preview` sirve el build.
+## Stack
+React + TypeScript + Vite + Tailwind CSS + React Router. Despliegue en Vercel. Solo frontend: no hay backend propio en este repositorio. React 19, Tailwind CSS v4 y Node 22. Por ahora usa datos de ejemplo en src/mocks; la lógica de datos está en src/services y la configuración del sitio en src/config/site.ts.
+
+## Comandos
+    npm install
+    npm run dev       # servidor de desarrollo
+    npm run build     # build de producción
+    npm run preview   # previsualizar el build
 
 ## Estructura
+- src/ : código fuente (componentes, páginas, estilos)
+- public/ : archivos estáticos (íconos e imágenes)
+- docs/ia/ : contexto, reglas, roadmap y decisiones para trabajar con IA
 
-- `src/main.tsx` - Punto de entrada; importa `src/index.css` y monta `src/App.tsx` en `#root`
-- `src/App.tsx` - Rutas de la aplicación
-- `src/index.css` - CSS global, tema de Tailwind v4 y componentes de marca (logo, contenedor)
-- `src/config/site.ts` - Datos del sitio (textos, contacto, banderas)
-- `src/services/` - Acceso a datos (hoy mocks en `src/mocks/`)
-- `vite.config.ts` - Configuración de Vite (React, Tailwind y alias `@` → `src`)
+## Antes de empezar una tarea, leer
+1. docs/ia/CONTEXTO.md (el negocio y sus límites)
+2. docs/ia/REGLAS.md (qué se puede y qué no)
+3. docs/ia/ROADMAP.md (estado real y lo pendiente)
+4. docs/ia/DECISIONES.md (por qué está hecho así)
 
-## Estilos
-
-Tailwind CSS v4 mediante `@tailwindcss/vite`. `src/index.css` importa Tailwind con `@import 'tailwindcss';`. Usa clases utilitarias en JSX; el tema y el CSS global van en `src/index.css`. No hay config de Tailwind ni de PostCSS.
-
-## Calidad de código
-
-- Usa comillas dobles para strings con apóstrofes, o escápalos en strings con comillas simples.
-- Cierra las etiquetas JSX y balancea las llaves.
-- Exporta los componentes como default.
+## Antes de dar algo por terminado
+- npm run build termina sin errores
+- Se revisó en móvil y en escritorio
+- No hay secretos ni datos reales de personas en el código
+- Se actualizó ROADMAP.md o DECISIONES.md si algo cambió
